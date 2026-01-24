@@ -4,3 +4,5 @@ python-jose
 passlib[bcrypt]
 cryptography
 python-multipart
+gunicorn
+Flask
