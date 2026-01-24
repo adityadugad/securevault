@@ -6,3 +6,5 @@ cryptography
 python-multipart
 gunicorn
 Flask
+pydantic[email]
+email-validator
