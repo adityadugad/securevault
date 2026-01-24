@@ -1,0 +1,7 @@
+[33mcommit ad3c08b1a00ad7328bb11335a2f596d48f79677d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Aditya Dugad <adityadugad@gmail.com>
+Date:   Sun Jan 25 01:32:17 2026 +0530
+
+    Add gunicorn to requirements
+
+requirements.txt
