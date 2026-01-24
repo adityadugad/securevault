@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SecureVault • Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Modern theme -->
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="brand">
+        <span class="badge">PQC Secured</span>
+      </div>
+
+      <h1>SecureVault</h1>
+      <p>Login with quantum-safe protection</p>
+
+      <!-- LOGIN FORM -->
+      <label>Email</label>
+      <input type="email" id="email" placeholder="you@example.com" />
+
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••" />
+
+      <button class="btn" onclick="login()">Login</button>
+
+      <!-- CREATE ACCOUNT -->
+      <div class="row" style="margin-top:12px">
+        <button class="btn secondary" onclick="goSignup()">
+          Create account
+        </button>
+      </div>
+
+      <div id="msg" class="msg"></div>
+    </div>
+  </div>
+
+  <!-- AUTH SCRIPT -->
+  <script src="/static/js/auth.js"></script>
+</body>
+</html>

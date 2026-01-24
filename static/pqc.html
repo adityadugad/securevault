@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SecureVault • PQC Metrics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body onload="requireAuth(); loadPqcMetrics();">
+
+  <!-- SIDEBAR -->
+  <div class="nav">
+    <h3>🔐 SecureVault</h3>
+    <a href="/static/dashboard.html">Dashboard</a>
+    <a href="/static/notes.html">Notes</a>
+    <a href="/static/todos.html">To-Dos</a>
+    <a href="/static/passwords.html">Passwords</a>
+    <a class="active" href="/static/pqc.html">PQC Metrics</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <h1>🧠 PQC Metrics (Live)</h1>
+    <p class="muted">
+      Runtime-generated metrics proving PQC-backed hybrid encryption
+    </p>
+
+    <div class="card">
+      <h3>CRYSTALS-Kyber Hybrid Metrics</h3>
+
+      <!-- ✅ THIS WAS MISSING -->
+      <div id="metricsBox" class="grid"></div>
+
+      <div id="pqcMsg" class="msg muted" style="margin-top:12px">
+        Updating every 5 seconds…
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="/static/js/auth.js"></script>
+
+  <script>
+    async function loadPqcMetrics() {
+      try {
+        const res = await fetch("/pqc/metrics");
+
+        if (!res.ok) {
+          document.getElementById("pqcMsg").innerText =
+            "Failed to load PQC metrics";
+          return;
+        }
+
+        const data = await res.json();
+        const box = document.getElementById("metricsBox");
+
+        if (!box) return;
+
+        box.innerHTML = "";
+
+        for (const key in data) {
+          const row = document.createElement("div");
+          row.className = "kv";
+          row.innerHTML = `
+            <span>${key.replaceAll("_", " ")}</span>
+            <span>${data[key]}</span>
+          `;
+          box.appendChild(row);
+        }
+      } catch (err) {
+        document.getElementById("pqcMsg").innerText =
+          "Network error while loading PQC metrics";
+      }
+    }
+
+    // Initial load + refresh every 5s
+    loadPqcMetrics();
+    setInterval(loadPqcMetrics, 5000);
+  </script>
+
+</body>
+</html>

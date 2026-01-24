@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SecureVault • OTP Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <span class="badge">Verification</span>
+
+      <h1>Enter OTP</h1>
+      <p>Please enter the 6-digit code sent to your email</p>
+
+      <label>OTP</label>
+      <input id="otp" placeholder="6-digit OTP" />
+
+      <!-- 🔑 IMPORTANT: unified OTP handler -->
+      <button class="btn" onclick="verifyOtp()">Verify OTP</button>
+
+      <div id="msg" class="msg"></div>
+
+      <div class="row" style="margin-top:14px">
+        <button class="btn secondary" onclick="goLogin()">Back to Login</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/auth.js"></script>
+</body>
+</html>
