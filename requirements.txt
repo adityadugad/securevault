@@ -9,3 +9,4 @@ Flask
 pydantic[email]
 email-validator
 argon2-cffi
+python-dotenv
