@@ -1,12 +1,41 @@
+# ================================
+# Core Framework & Server
+# ================================
 fastapi
-uvicorn
-python-jose
-passlib[bcrypt]
-cryptography
-python-multipart
+starlette
+uvicorn[standard]
 gunicorn
-Flask
-pydantic[email]
-email-validator
+
+# ================================
+# Authentication & Security
+# ================================
+python-jose[cryptography]
 argon2-cffi
+passlib[bcrypt]
+
+# ================================
+# Cryptography (Vault Encryption)
+# ================================
+cryptography
+
+# ================================
+# Forms, Uploads, Validation
+# ================================
+python-multipart
+email-validator
+pydantic[email]
+
+# ================================
+# Environment Variables
+# ================================
 python-dotenv
+
+# ================================
+# Database (SQLite on Render/Linux)
+# ================================
+sqlite-utils
+
+# ================================
+# HTTP & Utilities
+# ================================
+requests
