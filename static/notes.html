@@ -5,11 +5,29 @@
   <title>SecureVault • Notes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/static/css/style.css" />
+
+  <!-- ONLY ADDITION: SMALL OVERRIDES -->
+  <style>
+    .main {
+      margin-left: 0 !important;
+      width: 100%;
+    }
+
+    #noteContent {
+      height: 200px;
+    }
+
+    .center-btn {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+    }
+  </style>
 </head>
 
 <body onload="requireAuth(); loadNotes();">
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR (UNCHANGED) -->
   <div class="nav">
     <h3>🔐 SecureVault</h3>
     <a href="/static/dashboard.html">Dashboard</a>
@@ -33,9 +51,13 @@
       <input id="noteTitle" type="text" placeholder="Note title" />
 
       <label>Content</label>
-      <input id="noteContent" type="text" placeholder="Write your note..." />
+      <!-- ONLY CHANGE: input → textarea, SAME id -->
+      <textarea id="noteContent" placeholder="Write your note..."></textarea>
 
-      <button class="btn" onclick="saveNote()">💾 Save Encrypted Note</button>
+      <!-- ONLY CHANGE: wrapper to center button -->
+      <div class="center-btn">
+        <button class="btn" onclick="saveNote()">💾 Save Encrypted Note</button>
+      </div>
 
       <div id="noteMsg" class="msg"></div>
     </div>
@@ -46,7 +68,7 @@
     </div>
   </div>
 
-  <!-- SCRIPTS -->
+  <!-- SCRIPTS (UNCHANGED) -->
   <script src="/static/js/auth.js"></script>
   <script src="/static/js/notes.js"></script>
 
