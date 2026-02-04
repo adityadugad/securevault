@@ -5,11 +5,45 @@
   <title>SecureVault • To-Dos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/static/css/style.css" />
+
+  <!-- ONLY ADDITION: SMALL OVERRIDES -->
+  <style>
+    .main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .todo-wrapper {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .todo-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .todo-row input[type="text"] {
+      flex: 2;
+    }
+
+    .todo-row input[type="date"] {
+      flex: 1;
+    }
+
+    .center-btn {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+    }
+  </style>
 </head>
 
 <body onload="requireAuth(); loadTodos();">
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR (UNCHANGED) -->
   <div class="nav">
     <h3>🔐 SecureVault</h3>
     <a href="/static/dashboard.html">Dashboard</a>
@@ -22,26 +56,60 @@
 
   <!-- MAIN -->
   <div class="main">
-    <h1>✅ Encrypted To-Dos</h1>
-    <p class="muted">Tasks are encrypted before storage</p>
+    <div class="todo-wrapper">
 
-    <!-- ADD TODO -->
-    <div class="card" style="margin-bottom:24px">
-      <h3>Add New Task</h3>
+      <h1>✅ Encrypted To-Dos</h1>
+      <p class="muted">Tasks are encrypted before storage</p>
 
-      <label>Task</label>
-      <input id="todoTask" type="text" placeholder="Your task..." />
+      <!-- ADD TODO -->
+      <div class="card" style="margin-bottom:24px">
+        <h3>Add New Task</h3>
 
-      <button class="btn" onclick="saveTodo()">💾 Save Encrypted Task</button>
+        <label>Task</label>
 
-      <div id="todoMsg" class="msg"></div>
+        <!-- task + calendar -->
+        <div class="todo-row">
+          <input id="todoTask" type="text" placeholder="Your task..." />
+          <input id="todoDate" type="date" />
+        </div>
+
+        <div class="center-btn">
+          <button class="btn" onclick="prepareAndSaveTodo()">
+            💾 Save Encrypted Task
+          </button>
+        </div>
+
+        <div id="todoMsg" class="msg"></div>
+      </div>
+
+      <!-- TODO LIST (UNCHANGED) -->
+      <div class="grid" id="todosList"></div>
+
     </div>
-
-    <!-- TODO LIST -->
-    <div class="grid" id="todosList"></div>
   </div>
 
+  <!-- SCRIPTS (UNCHANGED) -->
   <script src="/static/js/auth.js"></script>
   <script src="/static/js/todos.js"></script>
+
+  <!-- HELPER FUNCTION -->
+  <script>
+    function prepareAndSaveTodo() {
+      const taskInput = document.getElementById("todoTask");
+      const dateInput = document.getElementById("todoDate");
+
+      if (dateInput.value) {
+        const d = new Date(dateInput.value);
+        const formattedDate =
+          d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear().toString().slice(-2);
+
+        taskInput.value =
+          taskInput.value + " on or before " + formattedDate;
+      }
+
+      saveTodo(); // existing function, unchanged
+    }
+  </script>
+
 </body>
 </html>
