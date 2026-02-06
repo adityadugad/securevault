@@ -6,13 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/static/css/style.css" />
 
-  <!-- ONLY ADDITION: SMALL OVERRIDES -->
+  <!-- ONLY SMALL, SAFE OVERRIDES -->
   <style>
+    /* Main layout + background (same as other modules) */
     .main {
+      margin-left: 240px;
+      width: calc(100% - 240px);
+      box-sizing: border-box;
+
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+
+      background:
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)),
+        url('/static/img/module-bg.jpg');
+      background-size: cover;
+      background-position: center;
     }
 
     .todo-wrapper {
@@ -38,6 +49,11 @@
       justify-content: center;
       margin-top: 16px;
     }
+
+    /* Center heading */
+    .todo-heading {
+      text-align: center;
+    }
   </style>
 </head>
 
@@ -58,8 +74,8 @@
   <div class="main">
     <div class="todo-wrapper">
 
-      <h1>✅ Encrypted To-Dos</h1>
-      <p class="muted">Tasks are encrypted before storage</p>
+      <h1 class="todo-heading">✅ Encrypted To-Dos</h1>
+      <p class="muted todo-heading">Tasks are encrypted before storage</p>
 
       <!-- ADD TODO -->
       <div class="card" style="margin-bottom:24px">
@@ -92,7 +108,7 @@
   <script src="/static/js/auth.js"></script>
   <script src="/static/js/todos.js"></script>
 
-  <!-- HELPER FUNCTION -->
+  <!-- HELPER FUNCTION (UNCHANGED) -->
   <script>
     function prepareAndSaveTodo() {
       const taskInput = document.getElementById("todoTask");

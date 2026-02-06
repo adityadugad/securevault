@@ -13,11 +13,18 @@
       margin-left: 240px; /* SAME as sidebar width */
       width: calc(100% - 240px);
       box-sizing: border-box;
+
+      /* BACKGROUND IMAGE (ONLY ADDITION) */
+      background:
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)),
+        url('/static/img/module-bg.jpg');
+      background-size: cover;
+      background-position: center;
     }
 
     /* Reduce textarea height to half */
     #noteContent {
-      height: 100px; /* was 200px */
+      height: 100px;
       resize: vertical;
     }
 
@@ -52,7 +59,12 @@
 
     .create-note-wrapper .card {
       width: 100%;
-      max-width: 700px; /* keeps it centered & readable */
+      max-width: 700px;
+    }
+
+    /* Center the notes heading */
+    .notes-heading {
+      text-align: center;
     }
   </style>
 </head>
@@ -72,8 +84,8 @@
 
   <!-- MAIN -->
   <div class="main">
-    <h1>📝 Encrypted Notes</h1>
-    <p class="muted">Notes are encrypted using PQC-backed AES-GCM keys</p>
+    <h1 class="notes-heading">📝 Encrypted Notes</h1>
+    <p class="muted notes-heading">Notes are encrypted using PQC-backed AES-GCM keys</p>
 
     <!-- CREATE NOTE (CENTERED) -->
     <div class="create-note-wrapper">
