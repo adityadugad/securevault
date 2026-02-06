@@ -7,6 +7,7 @@
 
   <link rel="stylesheet" href="/static/css/style.css" />
 </head>
+
 <body onload="requireAuth(); loadPqcMetrics();">
 
   <!-- SIDEBAR -->
@@ -30,12 +31,10 @@
     <div class="card">
       <h3>CRYSTALS-Kyber Hybrid Metrics</h3>
 
-      <!-- ✅ THIS WAS MISSING -->
       <div id="metricsBox" class="grid"></div>
 
-      <div id="pqcMsg" class="msg muted" style="margin-top:12px">
-        Updating every 5 seconds…
-      </div>
+      <!-- Date & time only -->
+      <div id="pqcMsg" class="msg muted" style="margin-top:12px"></div>
     </div>
   </div>
 
@@ -69,15 +68,20 @@
           `;
           box.appendChild(row);
         }
+
+        const now = new Date();
+        document.getElementById("pqcMsg").innerText =
+          "Last updated: " + now.toLocaleString();
+
       } catch (err) {
         document.getElementById("pqcMsg").innerText =
           "Network error while loading PQC metrics";
       }
     }
 
-    // Initial load + refresh every 5s
+    /* Initial load + refresh every 15 minutes */
     loadPqcMetrics();
-    setInterval(loadPqcMetrics, 5000);
+    setInterval(loadPqcMetrics, 15 * 60 * 1000);
   </script>
 
 </body>

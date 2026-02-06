@@ -8,16 +8,19 @@
 
   <!-- ONLY SMALL, SAFE OVERRIDES -->
   <style>
-    /* Fix overlap with sidebar */
+    /* Fix overlap with sidebar + GIF background */
     .main {
       margin-left: 240px; /* SAME as sidebar width */
       width: calc(100% - 240px);
       box-sizing: border-box;
 
-      /* BACKGROUND IMAGE (ONLY ADDITION) */
+      /* 🔧 IMPORTANT: fill full viewport */
+      min-height: 100vh;
+
+      /* GIF BACKGROUND (ONLY CHANGE) */
       background:
         linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)),
-        url('/static/img/module-bg.jpg');
+        url('/static/img/module-bggif.gif');
       background-size: cover;
       background-position: center;
     }
@@ -85,7 +88,9 @@
   <!-- MAIN -->
   <div class="main">
     <h1 class="notes-heading">📝 Encrypted Notes</h1>
-    <p class="muted notes-heading">Notes are encrypted using PQC-backed AES-GCM keys</p>
+    <p class="muted notes-heading">
+      Notes are encrypted using PQC-backed AES-GCM keys
+    </p>
 
     <!-- CREATE NOTE (CENTERED) -->
     <div class="create-note-wrapper">

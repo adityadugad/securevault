@@ -8,7 +8,7 @@
 
   <!-- ONLY SMALL, SAFE OVERRIDES -->
   <style>
-    /* Main layout + background (same as other modules) */
+    /* Main layout + GIF background (ONLY CHANGE) */
     .main {
       margin-left: 240px;
       width: calc(100% - 240px);
@@ -17,11 +17,14 @@
       display: flex;
       justify-content: center;
       align-items: center;
+
+      /* 🔧 Fill full viewport */
       min-height: 100vh;
 
+      /* GIF BACKGROUND */
       background:
         linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)),
-        url('/static/img/module-bg.jpg');
+        url('/static/img/module-bggif.gif');
       background-size: cover;
       background-position: center;
     }
