@@ -8,10 +8,14 @@
   <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 
-<body onload="requireAuth()">
+<body onload="requireAuth()" style="margin:0; height:100vh; overflow:hidden; display:flex;">
 
   <!-- SIDEBAR -->
-  <div class="nav">
+  <div class="nav" style="
+    width:240px;
+    height:100vh;
+    box-sizing:border-box;
+  ">
     <h2>🔐 SecureVault</h2>
 
     <a href="/static/dashboard.html" class="active">Dashboard</a>
@@ -24,28 +28,71 @@
   </div>
 
   <!-- MAIN -->
-  <div class="main">
+  <div class="main" style="
+    flex:1;
+    height:100vh;
+    padding:20px;
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+  ">
     <h1>Welcome 👋</h1>
     <p>Your quantum-safe vault is active.</p>
 
-    <div class="grid">
+    <!-- GRID -->
+    <div class="grid" style="
+      flex:1;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      grid-template-rows:1fr 1fr;
+      gap:12px;
+      width:100%;
+    ">
 
-      <div class="card hover" onclick="goNotes()">
+      <div class="card hover" onclick="goNotes()" style="
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+        text-align:center;
+        cursor:pointer;
+      ">
         <h3>📝 Notes</h3>
         <p>Encrypted private notes</p>
       </div>
 
-      <div class="card hover" onclick="goTodos()">
+      <div class="card hover" onclick="goTodos()" style="
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+        text-align:center;
+        cursor:pointer;
+      ">
         <h3>✅ To-Dos</h3>
         <p>Encrypted task management</p>
       </div>
 
-      <div class="card hover" onclick="goPasswords()">
+      <div class="card hover" onclick="goPasswords()" style="
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+        text-align:center;
+        cursor:pointer;
+      ">
         <h3>🔑 Password Vault</h3>
         <p>Store credentials securely</p>
       </div>
 
-      <div class="card hover" onclick="goPqc()">
+      <div class="card hover" onclick="goPqc()" style="
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+        text-align:center;
+        cursor:pointer;
+      ">
         <h3>🧠 PQC Metrics</h3>
         <p>CRYSTALS-Kyber proof</p>
       </div>
