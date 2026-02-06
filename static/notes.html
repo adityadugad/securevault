@@ -15,8 +15,9 @@
       box-sizing: border-box;
     }
 
+    /* Reduce textarea height to half */
     #noteContent {
-      height: 200px;
+      height: 100px; /* was 200px */
       resize: vertical;
     }
 
@@ -42,6 +43,17 @@
       justify-content: center;
       margin-top: 16px;
     }
+
+    /* Center the create-note card */
+    .create-note-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    .create-note-wrapper .card {
+      width: 100%;
+      max-width: 700px; /* keeps it centered & readable */
+    }
   </style>
 </head>
 
@@ -63,21 +75,23 @@
     <h1>📝 Encrypted Notes</h1>
     <p class="muted">Notes are encrypted using PQC-backed AES-GCM keys</p>
 
-    <!-- CREATE NOTE -->
-    <div class="card" style="margin-bottom:24px">
-      <h3>Create New Note</h3>
+    <!-- CREATE NOTE (CENTERED) -->
+    <div class="create-note-wrapper">
+      <div class="card" style="margin-bottom:24px">
+        <h3>Create New Note</h3>
 
-      <label>Title</label>
-      <input id="noteTitle" type="text" placeholder="Note title" />
+        <label>Title</label>
+        <input id="noteTitle" type="text" placeholder="Note title" />
 
-      <label>Content</label>
-      <textarea id="noteContent" placeholder="Write your note..."></textarea>
+        <label>Content</label>
+        <textarea id="noteContent" placeholder="Write your note..."></textarea>
 
-      <div class="center-btn">
-        <button class="btn" onclick="saveNote()">💾 Save Encrypted Note</button>
+        <div class="center-btn">
+          <button class="btn" onclick="saveNote()">💾 Save Encrypted Note</button>
+        </div>
+
+        <div id="noteMsg" class="msg"></div>
       </div>
-
-      <div id="noteMsg" class="msg"></div>
     </div>
 
     <!-- NOTES LIST -->
