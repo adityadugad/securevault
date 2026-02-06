@@ -35,13 +35,6 @@
     box-sizing:border-box;
     display:flex;
     flex-direction:column;
-
-    /* BACKGROUND IMAGE (ONLY ADDITION) */
-    background:
-      linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.75)),
-      url('/static/img/dashboard-bg.jpg');
-    background-size:cover;
-    background-position:center;
   ">
     <h1>Welcome 👋</h1>
     <p>Your quantum-safe vault is active.</p>
@@ -53,11 +46,13 @@
       grid-template-columns:1fr 1fr;
       grid-template-rows:1fr 1fr;
 
-      /* ONLY ROW GAP INCREASED */
+      /* ONLY CHANGE: vertical spacing increased */
       column-gap:10px;
-      row-gap:14px;
+      row-gap:16px;
 
       width:100%;
+      padding-left:60px;
+      box-sizing:border-box;
     ">
 
       <!-- NOTES -->
