@@ -35,6 +35,13 @@
     box-sizing:border-box;
     display:flex;
     flex-direction:column;
+
+    /* BACKGROUND IMAGE (ONLY ADDITION) */
+    background:
+      linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.75)),
+      url('/static/img/dashboard-bg.jpg');
+    background-size:cover;
+    background-position:center;
   ">
     <h1>Welcome 👋</h1>
     <p>Your quantum-safe vault is active.</p>
@@ -45,9 +52,12 @@
       display:grid;
       grid-template-columns:1fr 1fr;
       grid-template-rows:1fr 1fr;
-      gap:6px;
+
+      /* ONLY ROW GAP INCREASED */
+      column-gap:10px;
+      row-gap:14px;
+
       width:100%;
-      box-sizing:border-box;
     ">
 
       <!-- NOTES -->
@@ -57,12 +67,12 @@
         justify-content:center;
         align-items:center;
         text-align:center;
-        gap:8px;
+        gap:10px;
         cursor:pointer;
       ">
         <img src="/static/img/notes.png" style="
-          width:84px;
-          height:84px;
+          width:64px;
+          height:64px;
           object-fit:contain;
         ">
         <h3>📝 Notes</h3>
@@ -76,12 +86,12 @@
         justify-content:center;
         align-items:center;
         text-align:center;
-        gap:8px;
+        gap:10px;
         cursor:pointer;
       ">
         <img src="/static/img/todos.png" style="
-          width:84px;
-          height:84px;
+          width:64px;
+          height:64px;
           object-fit:contain;
         ">
         <h3>✅ To-Dos</h3>
@@ -95,12 +105,12 @@
         justify-content:center;
         align-items:center;
         text-align:center;
-        gap:8px;
+        gap:10px;
         cursor:pointer;
       ">
         <img src="/static/img/password.png" style="
-          width:84px;
-          height:84px;
+          width:64px;
+          height:64px;
           object-fit:contain;
         ">
         <h3>🔑 Password Vault</h3>
@@ -114,12 +124,12 @@
         justify-content:center;
         align-items:center;
         text-align:center;
-        gap:8px;
+        gap:10px;
         cursor:pointer;
       ">
         <img src="/static/img/pqc.png" style="
-          width:84px;
-          height:84px;
+          width:64px;
+          height:64px;
           object-fit:contain;
         ">
         <h3>🧠 PQC Metrics</h3>
