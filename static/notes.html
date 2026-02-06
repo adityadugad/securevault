@@ -6,15 +6,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/static/css/style.css" />
 
-  <!-- ONLY ADDITION: SMALL OVERRIDES -->
+  <!-- ONLY SMALL, SAFE OVERRIDES -->
   <style>
+    /* Fix overlap with sidebar */
     .main {
-      margin-left: 0 !important;
-      width: 100%;
+      margin-left: 240px; /* SAME as sidebar width */
+      width: calc(100% - 240px);
+      box-sizing: border-box;
     }
 
     #noteContent {
       height: 200px;
+      resize: vertical;
+    }
+
+    /* Match dark theme inputs */
+    input,
+    textarea {
+      background: #121212;
+      color: #ffffff;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      padding: 10px;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #888;
     }
 
     .center-btn {
@@ -51,10 +71,8 @@
       <input id="noteTitle" type="text" placeholder="Note title" />
 
       <label>Content</label>
-      <!-- ONLY CHANGE: input → textarea, SAME id -->
       <textarea id="noteContent" placeholder="Write your note..."></textarea>
 
-      <!-- ONLY CHANGE: wrapper to center button -->
       <div class="center-btn">
         <button class="btn" onclick="saveNote()">💾 Save Encrypted Note</button>
       </div>
@@ -64,7 +82,7 @@
 
     <!-- NOTES LIST -->
     <div class="grid" id="notesList">
-      <!-- JS injects notes + delete buttons here -->
+      <!-- JS injects notes here -->
     </div>
   </div>
 

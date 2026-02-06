@@ -31,7 +31,7 @@
   <div class="main" style="
     flex:1;
     height:100vh;
-    padding:20px;
+    padding:16px;
     box-sizing:border-box;
     display:flex;
     flex-direction:column;
@@ -45,54 +45,82 @@
       display:grid;
       grid-template-columns:1fr 1fr;
       grid-template-rows:1fr 1fr;
-      gap:12px;
+      gap:10px;
       width:100%;
     ">
 
+      <!-- NOTES -->
       <div class="card hover" onclick="goNotes()" style="
         display:flex;
         flex-direction:column;
         justify-content:center;
         align-items:center;
         text-align:center;
+        gap:10px;
         cursor:pointer;
       ">
+        <img src="/static/img/notes.png" style="
+          width:64px;
+          height:64px;
+          object-fit:contain;
+        ">
         <h3>📝 Notes</h3>
         <p>Encrypted private notes</p>
       </div>
 
+      <!-- TODOS -->
       <div class="card hover" onclick="goTodos()" style="
         display:flex;
         flex-direction:column;
         justify-content:center;
         align-items:center;
         text-align:center;
+        gap:10px;
         cursor:pointer;
       ">
+        <img src="/static/img/todos.png" style="
+          width:64px;
+          height:64px;
+          object-fit:contain;
+        ">
         <h3>✅ To-Dos</h3>
         <p>Encrypted task management</p>
       </div>
 
+      <!-- PASSWORDS -->
       <div class="card hover" onclick="goPasswords()" style="
         display:flex;
         flex-direction:column;
         justify-content:center;
         align-items:center;
         text-align:center;
+        gap:10px;
         cursor:pointer;
       ">
+        <img src="/static/img/password.png" style="
+          width:64px;
+          height:64px;
+          object-fit:contain;
+        ">
         <h3>🔑 Password Vault</h3>
         <p>Store credentials securely</p>
       </div>
 
+      <!-- PQC -->
       <div class="card hover" onclick="goPqc()" style="
         display:flex;
         flex-direction:column;
         justify-content:center;
         align-items:center;
         text-align:center;
+        gap:10px;
         cursor:pointer;
       ">
+        <img src="/static/img/pqc.png" style="
+          width:64px;
+          height:64px;
+          object-fit:contain;
+        ">
         <h3>🧠 PQC Metrics</h3>
         <p>CRYSTALS-Kyber proof</p>
       </div>
