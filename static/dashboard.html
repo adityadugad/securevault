@@ -15,6 +15,7 @@
     width:240px;
     height:100vh;
     box-sizing:border-box;
+    z-index:2;
   ">
     <h2>🔐 SecureVault</h2>
 
@@ -29,114 +30,82 @@
 
   <!-- MAIN -->
   <div class="main" style="
+    position:relative;
     flex:1;
     height:100vh;
     padding:16px;
     box-sizing:border-box;
     display:flex;
     flex-direction:column;
-
-    /* BACKGROUND IMAGE (ONLY ADDITION) */
-    background:
-      linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)),
-      url('/static/img/dashboard-bg.jpg');
-    background-size: cover;
-    background-position: center;
+    overflow:hidden;
   ">
-    <h1>Welcome 👋</h1>
-    <p>Your quantum-safe vault is active.</p>
 
-    <!-- GRID -->
-    <div class="grid" style="
-      flex:1;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      grid-template-rows:1fr 1fr;
-
-      column-gap:10px;
-      row-gap:16px;
-
+    <!-- BACKGROUND VIDEO -->
+    <video autoplay muted loop playsinline style="
+      position:absolute;
+      inset:0;
       width:100%;
-      padding-left:60px;
-      box-sizing:border-box;
+      height:100%;
+      object-fit:cover;
+      z-index:0;
     ">
+      <source src="/static/img/dashboardvideo-bg.mp4" type="video/mp4">
+    </video>
 
-      <!-- NOTES -->
-      <div class="card hover" onclick="goNotes()" style="
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        align-items:center;
-        text-align:center;
-        gap:10px;
-        cursor:pointer;
+    <!-- SAME DARK OVERLAY AS OLD IMAGE -->
+    <div style="
+      position:absolute;
+      inset:0;
+      background:linear-gradient(
+        rgba(0,0,0,0.6),
+        rgba(0,0,0,0.85)
+      );
+      z-index:1;
+    "></div>
+
+    <!-- CONTENT (UNCHANGED STRUCTURE) -->
+    <div style="position:relative; z-index:2; display:flex; flex-direction:column; height:100%;">
+      <h1>Welcome 👋</h1>
+      <p>Your quantum-safe vault is active.</p>
+
+      <!-- GRID -->
+      <div class="grid" style="
+        flex:1;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        grid-template-rows:1fr 1fr;
+        column-gap:10px;
+        row-gap:16px;
+        width:100%;
+        padding-left:60px;
+        box-sizing:border-box;
       ">
-        <img src="/static/img/notes.png" style="
-          width:64px;
-          height:64px;
-          object-fit:contain;
-        ">
-        <h3>📝 Notes</h3>
-        <p>Encrypted private notes</p>
-      </div>
 
-      <!-- TODOS -->
-      <div class="card hover" onclick="goTodos()" style="
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        align-items:center;
-        text-align:center;
-        gap:10px;
-        cursor:pointer;
-      ">
-        <img src="/static/img/todos.png" style="
-          width:64px;
-          height:64px;
-          object-fit:contain;
-        ">
-        <h3>✅ To-Dos</h3>
-        <p>Encrypted task management</p>
-      </div>
+        <div class="card hover" onclick="goNotes()" style="cursor:pointer;">
+          <img src="/static/img/notes.png" style="width:64px;height:64px;object-fit:contain;">
+          <h3>📝 Notes</h3>
+          <p>Encrypted private notes</p>
+        </div>
 
-      <!-- PASSWORDS -->
-      <div class="card hover" onclick="goPasswords()" style="
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        align-items:center;
-        text-align:center;
-        gap:10px;
-        cursor:pointer;
-      ">
-        <img src="/static/img/password.png" style="
-          width:64px;
-          height:64px;
-          object-fit:contain;
-        ">
-        <h3>🔑 Password Vault</h3>
-        <p>Store credentials securely</p>
-      </div>
+        <div class="card hover" onclick="goTodos()" style="cursor:pointer;">
+          <img src="/static/img/todos.png" style="width:64px;height:64px;object-fit:contain;">
+          <h3>✅ To-Dos</h3>
+          <p>Encrypted task management</p>
+        </div>
 
-      <!-- PQC -->
-      <div class="card hover" onclick="goPqc()" style="
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        align-items:center;
-        text-align:center;
-        gap:10px;
-        cursor:pointer;
-      ">
-        <img src="/static/img/pqc.png" style="
-          width:64px;
-          height:64px;
-          object-fit:contain;
-        ">
-        <h3>🧠 PQC Metrics</h3>
-        <p>CRYSTALS-Kyber proof</p>
-      </div>
+        <div class="card hover" onclick="goPasswords()" style="cursor:pointer;">
+          <img src="/static/img/password.png" style="width:64px;height:64px;object-fit:contain;">
+          <h3>🔑 Password Vault</h3>
+          <p>Store credentials securely</p>
+        </div>
 
+        <div class="card hover" onclick="goPqc()" style="cursor:pointer;">
+          <img src="/static/img/pqc.png" style="width:64px;height:64px;object-fit:contain;">
+          <h3>🧠 PQC Metrics</h3>
+          <p>CRYSTALS-Kyber proof</p>
+        </div>
+
+      </div>
     </div>
   </div>
 
