@@ -8,17 +8,22 @@
   <!-- Modern theme -->
   <link rel="stylesheet" href="/static/css/style.css" />
 
-  <!-- Background video styles (SAFE & ISOLATED) -->
+  <!-- HTML-only background video fix -->
   <style>
     .bg-video {
       position: fixed;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100vw;
       height: 100vh;
       object-fit: cover;
-      z-index: -1;
+      z-index: 0;
       pointer-events: none;
+    }
+
+    /* Lift all page content ABOVE the video */
+    body > *:not(.bg-video) {
+      position: relative;
+      z-index: 1;
     }
   </style>
 </head>
@@ -39,7 +44,6 @@
       <h1>SecureVault</h1>
       <p>Login with quantum-safe protection</p>
 
-      <!-- LOGIN FORM -->
       <label>Email</label>
       <input type="email" id="email" placeholder="you@example.com" />
 
@@ -48,7 +52,6 @@
 
       <button class="btn" onclick="login()">Login</button>
 
-      <!-- CREATE ACCOUNT -->
       <div class="row" style="margin-top:12px">
         <button class="btn secondary" onclick="goSignup()">
           Create account
@@ -59,7 +62,6 @@
     </div>
   </div>
 
-  <!-- AUTH SCRIPT -->
   <script src="/static/js/auth.js"></script>
 </body>
 </html>
