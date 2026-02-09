@@ -5,128 +5,18 @@
   <title>SecureVault • Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Main stylesheet -->
   <link rel="stylesheet" href="/static/css/style.css" />
-
-  <style>
-    /* ===== BASE LAYOUT ===== */
-    html {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--bg);
-    }
-
-    body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      display: flex;              /* ✅ flex ONLY here */
-      background: var(--bg);
-    }
-
-    /* ===== SIDEBAR ===== */
-    .nav {
-      width: 240px;
-      height: 100vh;
-      background: var(--card);
-      border-right: 1px solid rgba(148,163,184,.15);
-      padding: 18px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      z-index: 2;
-      flex-shrink: 0;             /* ✅ prevents sidebar shrink */
-    }
-
-    /* ===== MAIN AREA ===== */
-    .main {
-      flex: 1;
-      min-width: 0;               /* ✅ critical for Chromium */
-      height: 100vh;
-      position: relative;
-      padding: 24px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* ===== DASHBOARD GRID ===== */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 24px;
-      width: 100%;
-      flex: 1;
-      box-sizing: border-box;
-    }
-
-    /* ===== CARD ===== */
-    .card {
-      background: linear-gradient(
-        180deg,
-        rgba(255,255,255,.04),
-        rgba(255,255,255,.02)
-      ), var(--card);
-      border: 1px solid rgba(148,163,184,.15);
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 30px 60px rgba(0,0,0,.35);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 24px 50px rgba(0,0,0,.45);
-    }
-
-    /* ===== CARD VIDEO LOGO ===== */
-    .card video {
-      width: 280px;
-      height: 280px;
-      object-fit: contain;
-      margin-bottom: 20px;
-      border-radius: 14px;
-      background: rgba(0,0,0,0.25);
-      box-shadow: 0 6px 18px rgba(0,0,0,.35);
-    }
-
-    /* ===== TEXT ===== */
-    h1 {
-      margin: 0 0 4px 0;
-    }
-
-    p {
-      margin: 0 0 16px 0;
-      opacity: 0.85;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 1000px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .card video {
-        width: 220px;
-        height: 220px;
-      }
-    }
-  </style>
 </head>
 
-<body onload="requireAuth()">
+<body onload="requireAuth()" style="margin:0; height:100vh; overflow:hidden; display:flex;">
 
   <!-- SIDEBAR -->
-  <div class="nav">
+  <div class="nav" style="
+    width:240px;
+    height:100vh;
+    box-sizing:border-box;
+    z-index:2;
+  ">
     <h2>🔐 SecureVault</h2>
 
     <a href="/static/dashboard.html" class="active">Dashboard</a>
@@ -139,19 +29,27 @@
   </div>
 
   <!-- MAIN -->
-  <div class="main">
+  <div class="main" style="
+    position:relative;
+    flex:1;
+    height:100vh;
+    padding:16px;
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  ">
 
     <!-- BACKGROUND VIDEO -->
-    <video autoplay muted loop playsinline
-      style="
-        position:absolute;
-        inset:0;
-        width:100%;
-        height:100%;
-        object-fit:cover;
-        z-index:0;
-        filter: brightness(1.15) contrast(1.1);
-      ">
+    <video autoplay muted loop playsinline style="
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:0;
+      filter: brightness(1.2) contrast(1.08);
+    ">
       <source src="/static/img/bgvideo-1.0.mp4" type="video/mp4">
     </video>
 
@@ -159,53 +57,66 @@
     <div style="
       position:absolute;
       inset:0;
-      background: linear-gradient(
+      background:linear-gradient(
         rgba(0,0,0,0.25),
-        rgba(0,0,0,0.55)
+        rgba(0,0,0,0.45)
       );
       z-index:1;
     "></div>
 
     <!-- CONTENT -->
     <div style="
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
+      position:relative;
+      z-index:2;
+      display:flex;
+      flex-direction:column;
+      height:100%;
     ">
       <h1>Welcome 👋</h1>
       <p>Your quantum-safe vault is active.</p>
 
       <!-- GRID -->
-      <div class="grid">
+      <div class="grid" style="
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 16px !important;
+        max-width: 900px !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+        flex: 1;
+        box-sizing: border-box;
+      ">
 
-        <div class="card" onclick="goNotes()">
-          <video autoplay loop muted playsinline>
+        <!-- NOTES CARD -->
+        <div class="card hover" onclick="goNotes()" style="cursor:pointer; text-align:center;">
+          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
             <source src="/static/img/notesvideo-logo.mp4" type="video/mp4">
           </video>
           <h3>📝 Notes</h3>
           <p>Encrypted private notes</p>
         </div>
 
-        <div class="card" onclick="goTodos()">
-          <video autoplay loop muted playsinline>
+        <!-- TODOS CARD -->
+        <div class="card hover" onclick="goTodos()" style="cursor:pointer; text-align:center;">
+          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
             <source src="/static/img/todovideo-logo.mp4" type="video/mp4">
           </video>
           <h3>✅ To-Dos</h3>
           <p>Encrypted task management</p>
         </div>
 
-        <div class="card" onclick="goPasswords()">
-          <video autoplay loop muted playsinline>
+        <!-- PASSWORD CARD -->
+        <div class="card hover" onclick="goPasswords()" style="cursor:pointer; text-align:center;">
+          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
             <source src="/static/img/passwordvideo-logo.mp4" type="video/mp4">
           </video>
           <h3>🔑 Password Vault</h3>
           <p>Store credentials securely</p>
         </div>
 
-        <div class="card" onclick="goPqc()">
-          <video autoplay loop muted playsinline>
+        <!-- PQC METRICS CARD -->
+        <div class="card hover" onclick="goPqc()" style="cursor:pointer; text-align:center;">
+          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
             <source src="/static/img/metricsvideo-logo.mp4" type="video/mp4">
           </video>
           <h3>🧠 PQC Metrics</h3>
@@ -216,7 +127,6 @@
     </div>
   </div>
 
-  <!-- AUTH SCRIPT -->
   <script src="/static/js/auth.js"></script>
 </body>
 </html>
