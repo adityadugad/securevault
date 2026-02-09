@@ -78,7 +78,8 @@ input:focus{
 
 .nav{
   position:fixed;left:0;top:0;bottom:0;
-  width:220px;background:var(--card);
+  width:300px; /* updated from 220px to 300px */
+  background:var(--card);
   border-right:1px solid rgba(148,163,184,.15);
   padding:18px
 }
@@ -93,10 +94,12 @@ input:focus{
   background:rgba(34,211,238,.12)
 }
 
-.main{margin-left:240px;padding:24px}
+.main{margin-left:300px; /* updated from 240px to 300px */
+  padding:24px
+}
+
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
 .kv{display:flex;justify-content:space-between;color:var(--muted)}
-
 
 .card.hover {
   cursor: pointer;
