@@ -77,19 +77,20 @@
 
       <!-- GRID -->
       <div class="grid" style="
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 16px !important;
-        max-width: 900px !important;
-        margin: 0 auto !important;
-        width: 100% !important;
-        flex: 1;
-        box-sizing: border-box;
+        display:grid !important;
+        grid-template-columns:1fr 1fr !important;
+        gap:16px !important;
+        max-width:900px !important;
+        margin:0 auto !important;
+        width:100% !important;
+        flex:1;
+        box-sizing:border-box;
       ">
 
         <!-- NOTES CARD -->
         <div class="card hover" onclick="goNotes()" style="cursor:pointer; text-align:center;">
-          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
+          <video autoplay loop muted playsinline
+            style="width:280px; height:auto; max-width:100%; object-fit:contain; margin-bottom:16px;">
             <source src="/static/img/notesvideo-logo.mp4" type="video/mp4">
           </video>
           <h3>📝 Notes</h3>
@@ -98,7 +99,8 @@
 
         <!-- TODOS CARD -->
         <div class="card hover" onclick="goTodos()" style="cursor:pointer; text-align:center;">
-          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
+          <video autoplay loop muted playsinline
+            style="width:280px; height:auto; max-width:100%; object-fit:contain; margin-bottom:16px;">
             <source src="/static/img/todovideo-logo.mp4" type="video/mp4">
           </video>
           <h3>✅ To-Dos</h3>
@@ -107,7 +109,8 @@
 
         <!-- PASSWORD CARD -->
         <div class="card hover" onclick="goPasswords()" style="cursor:pointer; text-align:center;">
-          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
+          <video autoplay loop muted playsinline
+            style="width:280px; height:auto; max-width:100%; object-fit:contain; margin-bottom:16px;">
             <source src="/static/img/passwordvideo-logo.mp4" type="video/mp4">
           </video>
           <h3>🔑 Password Vault</h3>
@@ -116,7 +119,8 @@
 
         <!-- PQC METRICS CARD -->
         <div class="card hover" onclick="goPqc()" style="cursor:pointer; text-align:center;">
-          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
+          <video autoplay loop muted playsinline
+            style="width:280px; height:auto; max-width:100%; object-fit:contain; margin-bottom:16px;">
             <source src="/static/img/metricsvideo-logo.mp4" type="video/mp4">
           </video>
           <h3>🧠 PQC Metrics</h3>
