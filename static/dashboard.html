@@ -9,7 +9,7 @@
 
 <body onload="requireAuth()" style="margin:0;height:100vh;overflow:hidden;">
 
-  <!-- SIDEBAR (fixed via CSS) -->
+  <!-- SIDEBAR -->
   <div class="nav">
     <h2>🔐 SecureVault</h2>
 
@@ -22,7 +22,7 @@
     <a href="#" onclick="logout()">Logout</a>
   </div>
 
-  <!-- MAIN (offset handled by CSS margin-left:300px) -->
+  <!-- MAIN -->
   <div class="main" style="
     position:relative;
     height:100vh;
@@ -30,27 +30,19 @@
     padding:0;
   ">
 
-    <!-- BACKGROUND VIDEO (guaranteed to play) -->
-    <video
-      autoplay
-      muted
-      loop
-      playsinline
-      preload="auto"
-      style="
-        position:absolute;
-        top:0;
-        left:0;
-        width:100%;
-        height:100%;
-        object-fit:cover;
-        z-index:0;
-      "
-    >
+    <!-- BACKGROUND VIDEO -->
+    <video autoplay muted loop playsinline preload="auto" style="
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:0;
+    ">
       <source src="/static/img/bgvideo-1.0.mp4" type="video/mp4">
     </video>
 
-    <!-- OVERLAY (lighter so video is visible) -->
+    <!-- OVERLAY -->
     <div style="
       position:absolute;
       inset:0;
@@ -72,7 +64,7 @@
       flex-direction:column;
     ">
 
-      <!-- HEADER (compact, left-aligned) -->
+      <!-- HEADER -->
       <div style="flex:0 0 auto;">
         <h1 style="margin:0 0 4px;font-size:24px;">Welcome 👋</h1>
         <p style="margin:0 0 10px;font-size:13px;">
@@ -84,10 +76,11 @@
       <div style="
         flex:1;
         display:flex;
+        justify-content:center;   /* ✅ centers grid in main area */
         align-items:flex-start;
       ">
 
-        <!-- STRICT 2×2 GRID -->
+        <!-- STRICT 2×2 GRID (SHIFTED RIGHT VISUALLY) -->
         <div class="grid" style="
           display:grid;
           grid-template-columns:repeat(2, 1fr);
@@ -95,9 +88,9 @@
           gap:16px;
           max-width:900px;
           width:100%;
+          margin-left:40px;        /* ✅ subtle right shift */
         ">
 
-          <!-- NOTES -->
           <div class="card hover" onclick="goNotes()" style="text-align:center;">
             <video autoplay muted loop playsinline
               style="width:200px;margin:6px auto 8px;display:block;">
@@ -107,7 +100,6 @@
             <p style="margin:0;font-size:13px;">Encrypted private notes</p>
           </div>
 
-          <!-- TODOS -->
           <div class="card hover" onclick="goTodos()" style="text-align:center;">
             <video autoplay muted loop playsinline
               style="width:200px;margin:6px auto 8px;display:block;">
@@ -117,7 +109,6 @@
             <p style="margin:0;font-size:13px;">Encrypted task management</p>
           </div>
 
-          <!-- PASSWORDS -->
           <div class="card hover" onclick="goPasswords()" style="text-align:center;">
             <video autoplay muted loop playsinline
               style="width:200px;margin:6px auto 8px;display:block;">
@@ -127,7 +118,6 @@
             <p style="margin:0;font-size:13px;">Store credentials securely</p>
           </div>
 
-          <!-- PQC -->
           <div class="card hover" onclick="goPqc()" style="text-align:center;">
             <video autoplay muted loop playsinline
               style="width:200px;margin:6px auto 8px;display:block;">
