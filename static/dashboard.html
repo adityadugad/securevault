@@ -75,15 +75,16 @@
       <h1>Welcome 👋</h1>
       <p>Your quantum-safe vault is active.</p>
 
-      <!-- GRID (FINAL FIX: EXACT 16px GAP) -->
+      <!-- GRID (inline override to reduce gaps & force 2 columns) -->
       <div class="grid" style="
-        flex:1;
-        display:grid;
-        grid-template-columns:1fr 1fr;
-        grid-template-rows:1fr 1fr;
-        gap:16px;              /* EXACT 16px gap */
-        width:100%;
-        box-sizing:border-box;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;            /* smaller gap for closer cards */
+        max-width: 900px !important;     /* prevents stretching on large screens */
+        margin: 0 auto !important;       /* centers the grid */
+        width: 100% !important;
+        flex: 1;
+        box-sizing: border-box;
       ">
 
         <div class="card hover" onclick="goNotes()" style="cursor:pointer;">
