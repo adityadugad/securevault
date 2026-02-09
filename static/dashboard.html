@@ -14,7 +14,7 @@
     width:240px;
     height:100vh;
     box-sizing:border-box;
-    z-index:2;
+    z-index:3;
   ">
     <h2>🔐 SecureVault</h2>
 
@@ -32,20 +32,23 @@
     position:relative;
     flex:1;
     height:100vh;
+    margin:0;
+    padding:0;
     display:flex;
     flex-direction:column;
     overflow:hidden;
   ">
 
-    <!-- BACKGROUND VIDEO -->
+    <!-- BACKGROUND VIDEO (NO GAP FROM SIDEBAR) -->
     <video autoplay muted loop playsinline style="
       position:absolute;
-      inset:0;
+      top:0;
+      left:0;
       width:100%;
       height:100%;
       object-fit:cover;
       z-index:0;
-      filter:brightness(1.2) contrast(1.08);
+      filter:brightness(1.15) contrast(1.05);
     ">
       <source src="/static/img/bgvideo-1.0.mp4" type="video/mp4">
     </video>
@@ -64,41 +67,45 @@
       z-index:2;
       display:flex;
       flex-direction:column;
-      align-items:center;
+      align-items:flex-start;
+      justify-content:flex-start;
       height:100%;
-      padding:18px 16px 20px;
+      padding:12px 24px 16px 24px;
       box-sizing:border-box;
     ">
 
-      <h1 style="margin:0 0 6px;font-size:28px;">Welcome 👋</h1>
-      <p style="margin:0 0 18px;font-size:14px;">
+      <!-- HEADER SHIFTED LEFT + UP -->
+      <h1 style="margin:0 0 2px 0;font-size:26px;">
+        Welcome 👋
+      </h1>
+      <p style="margin:0 0 10px 0;font-size:13px;">
         Your quantum-safe vault is active.
       </p>
 
-      <!-- GRID -->
+      <!-- GRID SHIFTED UP -->
       <div class="grid" style="
         display:grid;
-        grid-template-columns:repeat(2, minmax(320px, 1fr));
-        gap:18px;
-        max-width:900px;
+        grid-template-columns:repeat(2, minmax(300px, 1fr));
+        gap:14px;
+        max-width:880px;
         width:100%;
+        margin-top:4px;
       ">
 
         <!-- NOTES -->
         <div class="card hover" onclick="goNotes()" style="
           cursor:pointer;
           text-align:center;
-          padding:18px;
+          padding:16px;
           display:flex;
           flex-direction:column;
           align-items:center;
-          justify-content:flex-start;
         ">
           <video autoplay loop muted playsinline
-            style="width:220px;max-width:100%;margin:12px 0;">
+            style="width:210px;max-width:100%;margin:8px 0 10px 0;">
             <source src="/static/img/notesvideo-logo.mp4" type="video/mp4">
           </video>
-          <h3 style="margin:6px 0 6px;">📝 Notes</h3>
+          <h3 style="margin:4px 0 4px;">📝 Notes</h3>
           <p style="margin:0;font-size:13px;">Encrypted private notes</p>
         </div>
 
@@ -106,16 +113,16 @@
         <div class="card hover" onclick="goTodos()" style="
           cursor:pointer;
           text-align:center;
-          padding:18px;
+          padding:16px;
           display:flex;
           flex-direction:column;
           align-items:center;
         ">
           <video autoplay loop muted playsinline
-            style="width:220px;max-width:100%;margin:12px 0;">
+            style="width:210px;max-width:100%;margin:8px 0 10px 0;">
             <source src="/static/img/todovideo-logo.mp4" type="video/mp4">
           </video>
-          <h3 style="margin:6px 0 6px;">✅ To-Dos</h3>
+          <h3 style="margin:4px 0 4px;">✅ To-Dos</h3>
           <p style="margin:0;font-size:13px;">Encrypted task management</p>
         </div>
 
@@ -123,16 +130,16 @@
         <div class="card hover" onclick="goPasswords()" style="
           cursor:pointer;
           text-align:center;
-          padding:18px;
+          padding:16px;
           display:flex;
           flex-direction:column;
           align-items:center;
         ">
           <video autoplay loop muted playsinline
-            style="width:220px;max-width:100%;margin:12px 0;">
+            style="width:210px;max-width:100%;margin:8px 0 10px 0;">
             <source src="/static/img/passwordvideo-logo.mp4" type="video/mp4">
           </video>
-          <h3 style="margin:6px 0 6px;">🔑 Password Vault</h3>
+          <h3 style="margin:4px 0 4px;">🔑 Password Vault</h3>
           <p style="margin:0;font-size:13px;">Store credentials securely</p>
         </div>
 
@@ -140,16 +147,16 @@
         <div class="card hover" onclick="goPqc()" style="
           cursor:pointer;
           text-align:center;
-          padding:18px;
+          padding:16px;
           display:flex;
           flex-direction:column;
           align-items:center;
         ">
           <video autoplay loop muted playsinline
-            style="width:220px;max-width:100%;margin:12px 0;">
+            style="width:210px;max-width:100%;margin:8px 0 10px 0;">
             <source src="/static/img/metricsvideo-logo.mp4" type="video/mp4">
           </video>
-          <h3 style="margin:6px 0 6px;">🧠 PQC Metrics</h3>
+          <h3 style="margin:4px 0 4px;">🧠 PQC Metrics</h3>
           <p style="margin:0;font-size:13px;">CRYSTALS-Kyber proof</p>
         </div>
 
