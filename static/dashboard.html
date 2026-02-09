@@ -50,7 +50,7 @@
       z-index:0;
       filter: brightness(1.2) contrast(1.08);
     ">
-      <source src="/static/img/dashboardvideo-bg.mp4" type="video/mp4">
+      <source src="/static/img/bgvideo-1.0.mp4" type="video/mp4">
     </video>
 
     <!-- OVERLAY -->
@@ -75,38 +75,50 @@
       <h1>Welcome 👋</h1>
       <p>Your quantum-safe vault is active.</p>
 
-      <!-- GRID (inline override to reduce gaps & force 2 columns) -->
+      <!-- GRID -->
       <div class="grid" style="
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 12px !important;            /* smaller gap for closer cards */
-        max-width: 900px !important;     /* prevents stretching on large screens */
-        margin: 0 auto !important;       /* centers the grid */
+        gap: 16px !important;
+        max-width: 900px !important;
+        margin: 0 auto !important;
         width: 100% !important;
         flex: 1;
         box-sizing: border-box;
       ">
 
-        <div class="card hover" onclick="goNotes()" style="cursor:pointer;">
-          <img src="/static/img/notes.png" style="width:64px;height:64px;object-fit:contain;">
+        <!-- NOTES CARD -->
+        <div class="card hover" onclick="goNotes()" style="cursor:pointer; text-align:center;">
+          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
+            <source src="/static/img/notesvideo-logo.mp4" type="video/mp4">
+          </video>
           <h3>📝 Notes</h3>
           <p>Encrypted private notes</p>
         </div>
 
-        <div class="card hover" onclick="goTodos()" style="cursor:pointer;">
-          <img src="/static/img/todos.png" style="width:64px;height:64px;object-fit:contain;">
+        <!-- TODOS CARD -->
+        <div class="card hover" onclick="goTodos()" style="cursor:pointer; text-align:center;">
+          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
+            <source src="/static/img/todovideo-logo.mp4" type="video/mp4">
+          </video>
           <h3>✅ To-Dos</h3>
           <p>Encrypted task management</p>
         </div>
 
-        <div class="card hover" onclick="goPasswords()" style="cursor:pointer;">
-          <img src="/static/img/password.png" style="width:64px;height:64px;object-fit:contain;">
+        <!-- PASSWORD CARD -->
+        <div class="card hover" onclick="goPasswords()" style="cursor:pointer; text-align:center;">
+          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
+            <source src="/static/img/passwordvideo-logo.mp4" type="video/mp4">
+          </video>
           <h3>🔑 Password Vault</h3>
           <p>Store credentials securely</p>
         </div>
 
-        <div class="card hover" onclick="goPqc()" style="cursor:pointer;">
-          <img src="/static/img/pqc.png" style="width:64px;height:64px;object-fit:contain;">
+        <!-- PQC METRICS CARD -->
+        <div class="card hover" onclick="goPqc()" style="cursor:pointer; text-align:center;">
+          <video autoplay loop muted playsinline style="width:80px; height:80px; object-fit:contain; margin-bottom:12px;">
+            <source src="/static/img/metricsvideo-logo.mp4" type="video/mp4">
+          </video>
           <h3>🧠 PQC Metrics</h3>
           <p>CRYSTALS-Kyber proof</p>
         </div>
