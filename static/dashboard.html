@@ -10,11 +10,19 @@
 
   <style>
     /* ===== BASE LAYOUT ===== */
-    html, body {
+    html {
       margin: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      width: 100%;
       height: 100%;
       overflow: hidden;
-      display: flex;
+      display: flex;              /* ✅ flex ONLY here */
       background: var(--bg);
     }
 
@@ -29,11 +37,13 @@
       display: flex;
       flex-direction: column;
       z-index: 2;
+      flex-shrink: 0;             /* ✅ prevents sidebar shrink */
     }
 
     /* ===== MAIN AREA ===== */
     .main {
       flex: 1;
+      min-width: 0;               /* ✅ critical for Chromium */
       height: 100vh;
       position: relative;
       padding: 24px;
@@ -170,7 +180,6 @@
       <!-- GRID -->
       <div class="grid">
 
-        <!-- NOTES -->
         <div class="card" onclick="goNotes()">
           <video autoplay loop muted playsinline>
             <source src="/static/img/notesvideo-logo.mp4" type="video/mp4">
@@ -179,7 +188,6 @@
           <p>Encrypted private notes</p>
         </div>
 
-        <!-- TODOS -->
         <div class="card" onclick="goTodos()">
           <video autoplay loop muted playsinline>
             <source src="/static/img/todovideo-logo.mp4" type="video/mp4">
@@ -188,7 +196,6 @@
           <p>Encrypted task management</p>
         </div>
 
-        <!-- PASSWORDS -->
         <div class="card" onclick="goPasswords()">
           <video autoplay loop muted playsinline>
             <source src="/static/img/passwordvideo-logo.mp4" type="video/mp4">
@@ -197,7 +204,6 @@
           <p>Store credentials securely</p>
         </div>
 
-        <!-- PQC METRICS -->
         <div class="card" onclick="goPqc()">
           <video autoplay loop muted playsinline>
             <source src="/static/img/metricsvideo-logo.mp4" type="video/mp4">
