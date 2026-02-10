@@ -1,37 +1,46 @@
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 import os
 import base64
 import hashlib
+import requests
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-# ======================================================
-# AES CONFIG (RENDER + LOCAL SAFE)
-# ======================================================
-# Render env vars are STRINGS
-# We derive a stable 32-byte AES-256 key using SHA-256
+KYBER_SERVICE_URL = os.getenv("KYBER_SERVICE_URL")
+BACKUP_SECRET = os.getenv("SECUREVAULT_AES_KEY", "securevault-dev-backup-key")
 
-def _derive_aes_key() -> bytes:
-    secret = os.environ.get(
-        "SECUREVAULT_AES_KEY",
-        "securevault-dev-key-change-this"
-    )
+# --------------------------------------------------
+# REAL KYBER → AES KEY DERIVATION
+# --------------------------------------------------
 
-    # Ensure string → bytes
-    if not isinstance(secret, str):
-        secret = str(secret)
+def _get_aes_key() -> bytes:
+    """
+    Priority:
+    1. Real Kyber shared secret (ML-KEM-512)
+    2. Fallback env-based secret (Render safe)
+    """
+    if KYBER_SERVICE_URL:
+        try:
+            res = requests.get(
+                f"{KYBER_SERVICE_URL}/kyber",
+                timeout=4
+            )
+            if res.ok and res.text:
+                shared_secret = base64.b64decode(res.text.strip())
+                return hashlib.sha256(shared_secret).digest()
+        except Exception:
+            pass
 
-    # SHA-256 → always 32 bytes (AES-256 safe)
-    return hashlib.sha256(secret.encode("utf-8")).digest()
+    # Fallback (never breaks app)
+    return hashlib.sha256(BACKUP_SECRET.encode()).digest()
 
 
-AES_KEY = _derive_aes_key()
-
-# ======================================================
+# --------------------------------------------------
 # ENCRYPT
-# ======================================================
+# --------------------------------------------------
 
 def encrypt_text(plaintext: str) -> dict:
-    aesgcm = AESGCM(AES_KEY)
-    nonce = os.urandom(12)  # AES-GCM standard nonce size
+    aes_key = _get_aes_key()
+    aesgcm = AESGCM(aes_key)
+    nonce = os.urandom(12)
 
     ciphertext = aesgcm.encrypt(
         nonce,
@@ -40,25 +49,21 @@ def encrypt_text(plaintext: str) -> dict:
     )
 
     return {
-        "ciphertext": base64.b64encode(ciphertext).decode("utf-8"),
-        "nonce": base64.b64encode(nonce).decode("utf-8")
+        "ciphertext": base64.b64encode(ciphertext).decode(),
+        "nonce": base64.b64encode(nonce).decode()
     }
 
 
-# ======================================================
+# --------------------------------------------------
 # DECRYPT
-# ======================================================
+# --------------------------------------------------
 
 def decrypt_text(ciphertext_b64: str, nonce_b64: str) -> str:
-    aesgcm = AESGCM(AES_KEY)
+    aes_key = _get_aes_key()
+    aesgcm = AESGCM(aes_key)
 
-    ciphertext = base64.b64decode(ciphertext_b64.encode("utf-8"))
-    nonce = base64.b64decode(nonce_b64.encode("utf-8"))
+    ciphertext = base64.b64decode(ciphertext_b64)
+    nonce = base64.b64decode(nonce_b64)
 
-    plaintext = aesgcm.decrypt(
-        nonce,
-        ciphertext,
-        None
-    )
-
+    plaintext = aesgcm.decrypt(nonce, ciphertext, None)
     return plaintext.decode("utf-8")

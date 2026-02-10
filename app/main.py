@@ -86,3 +86,19 @@ def health():
         "status": "SecureVault Backend Running",
         "environment": os.getenv("RENDER", "local"),
     }
+# -------------------------------------------------
+# KYBER SERVICE WARMUP (RENDER COLD START FIX)
+# -------------------------------------------------
+import threading
+import requests
+from app.config import KYBER_SERVICE_URL
+
+def warmup_kyber():
+    if not KYBER_SERVICE_URL:
+        return
+    try:
+        requests.get(f"{KYBER_SERVICE_URL}/kyber", timeout=1)
+    except Exception:
+        pass
+
+threading.Thread(target=warmup_kyber, daemon=True).start()
