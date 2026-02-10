@@ -9,7 +9,7 @@
 
 <body onload="requireAuth()" style="margin:0;min-height:100vh;overflow-y:auto;">
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR (UNCHANGED) -->
   <div class="nav">
     <h2>🔐 SecureVault</h2>
 
@@ -30,10 +30,11 @@
     padding:0;
   ">
 
-    <!-- BACKGROUND VIDEO -->
+    <!-- BACKGROUND VIDEO (FIXED) -->
     <video autoplay muted loop playsinline preload="auto" style="
-      position:fixed;
-      inset:0;
+      position:absolute;
+      top:0;
+      left:0;
       width:100%;
       height:100%;
       object-fit:cover;
@@ -44,7 +45,7 @@
 
     <!-- OVERLAY -->
     <div style="
-      position:fixed;
+      position:absolute;
       inset:0;
       background:linear-gradient(
         rgba(0,0,0,0.15),
@@ -58,7 +59,7 @@
       position:relative;
       z-index:2;
       min-height:100vh;
-      padding:14px 24px 32px;
+      padding:16px 28px 40px;
       box-sizing:border-box;
       display:flex;
       flex-direction:column;
@@ -67,7 +68,7 @@
       <!-- HEADER -->
       <div>
         <h1 style="margin:0 0 4px;font-size:24px;">Welcome 👋</h1>
-        <p style="margin:0 0 16px;font-size:13px;">
+        <p style="margin:0 0 18px;font-size:13px;">
           Your quantum-safe vault is active.
         </p>
       </div>
@@ -77,17 +78,16 @@
         display:flex;
         justify-content:center;
         align-items:flex-start;
-        padding-bottom:24px;
+        padding-bottom:32px;
       ">
 
         <!-- STRICT 2×2 GRID -->
         <div class="grid" style="
           display:grid;
-          grid-template-columns:repeat(2, 1fr);
+          grid-template-columns:repeat(2, minmax(260px, 1fr));
           gap:16px;
           max-width:900px;
           width:100%;
-          margin-left:40px;
         ">
 
           <div class="card hover" onclick="goNotes()" style="text-align:center;">
