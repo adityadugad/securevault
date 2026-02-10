@@ -39,3 +39,11 @@ sqlite-utils
 # HTTP & Utilities
 # ================================
 requests
+
+# ================================
+# Machine Learning (SVM Inference)
+# ================================
+scikit-learn
+joblib
+numpy
+scipy
