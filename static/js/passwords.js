@@ -2,8 +2,43 @@
 // PASSWORD VAULT LOGIC
 // ===============================
 
+// -------------------------------
+// LOAD PASSWORDS (RESTORED)
+// -------------------------------
 async function loadPasswords() {
-  // unchanged (your original logic can remain here if needed)
+  const token = localStorage.getItem("token");
+  const list = document.getElementById("passwordsList");
+  list.innerHTML = "";
+
+  try {
+    const res = await fetch("/vault/passwords/decrypted", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+
+    data.passwords.forEach(p => {
+      list.innerHTML += `
+        <div class="card">
+          <h4>🔐 ${p.site}</h4>
+          <p class="muted">User: ${p.username}</p>
+          <p><strong>Password:</strong> ${p.password}</p>
+          <div class="kv">
+            <span>Created</span>
+            <span>${p.created_at}</span>
+          </div>
+          <button class="btn secondary" onclick="deletePassword(${p.id})">
+            🗑 Delete
+          </button>
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    console.error("Failed to load passwords", err);
+  }
 }
 
 // -------------------------------
@@ -67,6 +102,7 @@ async function deletePassword(id) {
 
 async function checkPasswordStrength(pwd) {
   const token = localStorage.getItem("token");
+
   if (!pwd) {
     resetStrengthUI();
     return;
@@ -87,8 +123,9 @@ async function checkPasswordStrength(pwd) {
     const data = await res.json();
     applyStrengthUI(data.strength);
 
-  } catch {
+  } catch (err) {
     // silent fail (no UI break)
+    console.error("Strength check failed", err);
   }
 }
 
@@ -104,7 +141,7 @@ function applyStrengthUI(strength) {
     input.style.borderColor = "#facc15";
     text.innerText = "Password strength: Medium";
     text.style.color = "#facc15";
-  } else {
+  } else if (strength === "strong") {
     input.style.borderColor = "#22c55e";
     text.innerText = "Password strength: Strong";
     text.style.color = "#22c55e";
