@@ -10,14 +10,11 @@
   <style>
     /* Fix overlap with sidebar + GIF background */
     .main {
-      margin-left: 240px; /* SAME as sidebar width */
+      margin-left: 240px;
       width: calc(100% - 240px);
       box-sizing: border-box;
-
-      /* 🔧 IMPORTANT: fill full viewport */
       min-height: 100vh;
 
-      /* GIF BACKGROUND (ONLY CHANGE) */
       background:
         linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)),
         url('/static/img/module-bggif.gif');
@@ -25,13 +22,13 @@
       background-position: center;
     }
 
-    /* Reduce textarea height to half */
+    /* Reduce textarea height */
     #noteContent {
       height: 100px;
       resize: vertical;
     }
 
-    /* Match dark theme inputs */
+    /* Dark theme inputs */
     input,
     textarea {
       background: #121212;
@@ -54,7 +51,7 @@
       margin-top: 16px;
     }
 
-    /* Center the create-note card */
+    /* Center create-note card */
     .create-note-wrapper {
       display: flex;
       justify-content: center;
@@ -65,16 +62,28 @@
       max-width: 700px;
     }
 
-    /* Center the notes heading */
+    /* Center headings */
     .notes-heading {
       text-align: center;
+    }
+
+    /* 🔧 NEW: center notes list safely */
+    .notes-list-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .notes-list-wrapper .grid {
+      width: 100%;
+      max-width: 1100px;
     }
   </style>
 </head>
 
 <body onload="requireAuth(); loadNotes();">
 
-  <!-- SIDEBAR (UNCHANGED) -->
+  <!-- SIDEBAR -->
   <div class="nav">
     <h3>🔐 SecureVault</h3>
     <a href="/static/dashboard.html">Dashboard</a>
@@ -92,7 +101,7 @@
       Notes are encrypted using PQC-backed AES-GCM keys
     </p>
 
-    <!-- CREATE NOTE (CENTERED) -->
+    <!-- CREATE NOTE -->
     <div class="create-note-wrapper">
       <div class="card" style="margin-bottom:24px">
         <h3>Create New Note</h3>
@@ -111,15 +120,16 @@
       </div>
     </div>
 
-    <!-- NOTES LIST -->
-    <div class="grid" id="notesList">
-      <!-- JS injects notes here -->
+    <!-- 📝 NOTES LIST (CENTERED FIX) -->
+    <div class="notes-list-wrapper">
+      <div class="grid" id="notesList">
+        <!-- JS injects notes here -->
+      </div>
     </div>
   </div>
 
-  <!-- SCRIPTS (UNCHANGED) -->
+  <!-- SCRIPTS -->
   <script src="/static/js/auth.js"></script>
   <script src="/static/js/notes.js"></script>
-
 </body>
 </html>

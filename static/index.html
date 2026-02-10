@@ -8,8 +8,14 @@
   <!-- Modern theme -->
   <link rel="stylesheet" href="/static/css/style.css" />
 
-  <!-- HTML-only background video fix -->
+  <!-- HTML-only background video + scroll fix -->
   <style>
+    /* Allow page to scroll when content exceeds viewport */
+    html, body {
+      height: 100%;
+      overflow-y: auto;
+    }
+
     .bg-video {
       position: fixed;
       inset: 0;
@@ -25,6 +31,23 @@
       position: relative;
       z-index: 1;
     }
+
+    /* Ensure container can grow naturally */
+    .container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 0; /* allows scroll padding */
+    }
+
+    /* Forgot password link */
+    .forgot-link {
+      display: block;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -34,7 +57,7 @@
     <source src="/static/img/login-bg.mp4" type="video/mp4">
   </video>
 
-  <!-- EXISTING CONTENT (UNCHANGED) -->
+  <!-- CONTENT -->
   <div class="container">
     <div class="card">
       <div class="brand">
@@ -51,6 +74,11 @@
       <input type="password" id="password" placeholder="••••••••" />
 
       <button class="btn" onclick="login()">Login</button>
+
+      <!-- Forgot Password -->
+      <a href="/static/forgot-password.html" class="forgot-link muted">
+        Forgot password?
+      </a>
 
       <div class="row" style="margin-top:12px">
         <button class="btn secondary" onclick="goSignup()">
