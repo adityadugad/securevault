@@ -3,8 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <title>SecureVault • Signup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/static/css/style.css" />
+
+  <style>
+    .strength-text {
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+
+    .password-note {
+      font-size: 0.8rem;
+      margin-top: 6px;
+      color: #9ca3af;
+    }
+  </style>
 </head>
+
 <body>
   <div class="container">
     <div class="card">
@@ -17,14 +32,126 @@
       <input id="email" type="email" placeholder="you@example.com" />
 
       <label>Password</label>
-      <input id="password" type="password" placeholder="••••••••" />
+      <input
+        id="password"
+        type="password"
+        placeholder="••••••••"
+        oninput="onPasswordInput(this.value)"
+      />
 
-      <button class="btn" onclick="signup()">Sign up</button>
+      <!-- Password rules note -->
+      <div class="password-note">
+        Password must be at least 8 characters and include uppercase, lowercase,
+        and a special character.
+      </div>
+
+      <!-- Strength feedback -->
+      <div id="strengthText" class="strength-text muted"></div>
+
+      <button class="btn" onclick="signupWithValidation()">
+        Sign up
+      </button>
 
       <div id="msg" class="msg"></div>
     </div>
   </div>
 
   <script src="/static/js/auth.js"></script>
+
+  <script>
+    let passwordValid = false;
+
+    // -------------------------------
+    // PASSWORD INPUT HANDLER
+    // -------------------------------
+    function onPasswordInput(pwd) {
+      validatePasswordRules(pwd);
+      checkPasswordStrength(pwd);
+    }
+
+    // -------------------------------
+    // RULE-BASED VALIDATION
+    // -------------------------------
+    function validatePasswordRules(pwd) {
+      const msg = document.getElementById("msg");
+      const input = document.getElementById("password");
+
+      const hasUpper = /[A-Z]/.test(pwd);
+      const hasLower = /[a-z]/.test(pwd);
+      const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
+      const hasLength = pwd.length >= 8;
+
+      passwordValid = hasUpper && hasLower && hasSpecial && hasLength;
+
+      if (!pwd) {
+        msg.innerText = "";
+        input.style.borderColor = "";
+        return;
+      }
+
+      if (!passwordValid) {
+        msg.innerText =
+          "Password must contain 8+ characters, uppercase, lowercase, and special character.";
+        msg.className = "msg err";
+        input.style.borderColor = "#ef4444";
+      } else {
+        msg.innerText = "";
+      }
+    }
+
+    // -------------------------------
+    // SVM PASSWORD STRENGTH CHECK
+    // -------------------------------
+    async function checkPasswordStrength(pwd) {
+      const text = document.getElementById("strengthText");
+      const input = document.getElementById("password");
+
+      if (!pwd) {
+        text.innerText = "";
+        return;
+      }
+
+      try {
+        const res = await fetch("/vault/password-strength", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: pwd })
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        if (data.strength === "weak") {
+          text.innerText = "Password strength: Weak";
+          text.style.color = "#ef4444";
+        } else if (data.strength === "medium") {
+          text.innerText = "Password strength: Medium";
+          text.style.color = "#facc15";
+        } else {
+          text.innerText = "Password strength: Strong";
+          text.style.color = "#22c55e";
+        }
+      } catch {
+        // silent fail
+      }
+    }
+
+    // -------------------------------
+    // SAFE SIGNUP WRAPPER
+    // -------------------------------
+    function signupWithValidation() {
+      if (!passwordValid) {
+        const msg = document.getElementById("msg");
+        msg.innerText =
+          "Please meet the password requirements before signing up.";
+        msg.className = "msg err";
+        return;
+      }
+
+      // Call existing signup logic (UNCHANGED)
+      signup();
+    }
+  </script>
 </body>
 </html>
