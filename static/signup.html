@@ -11,17 +11,24 @@
       margin: 0;
       overflow: hidden;
       position: relative;
+      background: transparent !important; /* override style.css */
     }
 
-    /* Background Video */
+    /* FORCE VIDEO TO BACK */
     .bg-video {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
       object-fit: cover;
-      z-index: -1;
+      z-index: -9999;
+    }
+
+    /* Ensure content above video */
+    .container,
+    .card {
+      position: relative;
+      z-index: 10;
     }
 
     .strength-text {
@@ -57,7 +64,6 @@
   <!-- Background Video -->
   <video autoplay muted loop playsinline class="bg-video">
     <source src="/static/img/signvideo-bg.mp4?v=1" type="video/mp4">
-    Your browser does not support the video tag.
   </video>
 
   <div class="container">
@@ -117,18 +123,12 @@
     let passwordValid = false;
     let confirmValid = false;
 
-    // -------------------------------
-    // PASSWORD INPUT HANDLER
-    // -------------------------------
     function onPasswordInput(pwd) {
       validatePasswordRules(pwd);
       checkPasswordStrength(pwd);
       checkConfirmPassword();
     }
 
-    // -------------------------------
-    // RULE-BASED VALIDATION
-    // -------------------------------
     function validatePasswordRules(pwd) {
       const msg = document.getElementById("msg");
       const input = document.getElementById("password");
@@ -157,9 +157,6 @@
       }
     }
 
-    // -------------------------------
-    // CONFIRM PASSWORD CHECK
-    // -------------------------------
     function checkConfirmPassword() {
       const pwd = document.getElementById("password").value;
       const confirmPwd = document.getElementById("confirmPassword").value;
@@ -184,9 +181,6 @@
       }
     }
 
-    // -------------------------------
-    // SVM PASSWORD STRENGTH CHECK
-    // -------------------------------
     async function checkPasswordStrength(pwd) {
       const text = document.getElementById("strengthText");
 
@@ -221,17 +215,11 @@
       }
     }
 
-    // -------------------------------
-    // TOGGLE PASSWORD VISIBILITY
-    // -------------------------------
     function togglePassword(id) {
       const input = document.getElementById(id);
       input.type = input.type === "password" ? "text" : "password";
     }
 
-    // -------------------------------
-    // SAFE SIGNUP WRAPPER
-    // -------------------------------
     function signupWithValidation() {
       if (!passwordValid || !confirmValid) {
         const msg = document.getElementById("msg");

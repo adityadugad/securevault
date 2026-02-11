@@ -9,38 +9,37 @@
   <style>
     body {
       margin: 0;
-      display: flex;
       min-height: 100vh;
-      overflow: hidden;
+      display: flex;
       position: relative;
+      overflow-x: hidden;
     }
 
-    /* Background Video */
-    .bg-video {
+    /* FORCE VIDEO AT BACK */
+    video.bg-video {
       position: fixed;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100vw;
       height: 100vh;
       object-fit: cover;
-      z-index: -2;
+      z-index: -1000;
     }
 
-    /* Dark overlay for readability */
+    /* Overlay */
     .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: -1;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: -900;
     }
 
-    /* Sidebar remains fixed width */
-    .nav {
+    /* Ensure content above video */
+    .nav, .main {
       position: relative;
-      z-index: 2;
+      z-index: 10;
     }
 
-    /* Main layout */
+    /* Center main */
     .main {
       flex: 1;
       display: flex;
@@ -48,32 +47,33 @@
       align-items: center;
       justify-content: center;
       padding: 40px;
-      z-index: 2;
+      text-align: center;
     }
 
+    /* Center card */
     .card {
       width: 100%;
       max-width: 650px;
-    }
-
-    /* Proper key-value arrangement */
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px 20px;
       margin-top: 20px;
     }
 
-    .kv {
-      display: contents;
+    /* Table Styling */
+    .metrics-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
     }
 
-    .kv span:first-child {
+    .metrics-table td {
+      padding: 10px 12px;
+    }
+
+    .metrics-table td:first-child {
+      text-align: left;
       color: #9ca3af;
-      text-transform: capitalize;
     }
 
-    .kv span:last-child {
+    .metrics-table td:last-child {
       text-align: right;
       font-weight: 600;
     }
@@ -87,7 +87,6 @@
     <source src="/static/img/metricsvideo-bg.mp4?v=1" type="video/mp4">
   </video>
 
-  <!-- Dark Overlay -->
   <div class="overlay"></div>
 
   <!-- SIDEBAR -->
@@ -110,7 +109,9 @@
 
     <div class="card">
       <h3>CRYSTALS-Kyber Hybrid Metrics</h3>
-      <div id="metricsBox" class="grid"></div>
+
+      <table class="metrics-table" id="metricsTable"></table>
+
       <div id="pqcMsg" class="msg muted" style="display:none;"></div>
     </div>
   </div>
@@ -119,6 +120,13 @@
   <script src="/static/js/auth.js"></script>
 
   <script>
+    function formatLabel(text) {
+      return text
+        .replaceAll("_", " ")
+        .toLowerCase()
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
     async function loadPqcMetrics() {
       try {
         const res = await fetch("/pqc/metrics");
@@ -130,20 +138,19 @@
         }
 
         const data = await res.json();
-        const box = document.getElementById("metricsBox");
+        const table = document.getElementById("metricsTable");
 
-        if (!box) return;
+        if (!table) return;
 
-        box.innerHTML = "";
+        table.innerHTML = "";
 
         for (const key in data) {
-          const row = document.createElement("div");
-          row.className = "kv";
+          const row = document.createElement("tr");
           row.innerHTML = `
-            <span>${key.replaceAll("_", " ")}</span>
-            <span>${data[key]}</span>
+            <td>${formatLabel(key)}</td>
+            <td>${data[key]}</td>
           `;
-          box.appendChild(row);
+          table.appendChild(row);
         }
 
         const now = new Date();
