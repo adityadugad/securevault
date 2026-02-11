@@ -7,6 +7,23 @@
   <link rel="stylesheet" href="/static/css/style.css" />
 
   <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Background Video */
+    .bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
     .strength-text {
       margin-top: 6px;
       font-size: 0.9rem;
@@ -17,10 +34,31 @@
       margin-top: 6px;
       color: #9ca3af;
     }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .toggle-eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #9ca3af;
+      user-select: none;
+    }
   </style>
 </head>
 
 <body>
+
+  <!-- Background Video -->
+  <video autoplay muted loop class="bg-video">
+    <source src="/static/img/signvideo-bg.mp4" type="video/mp4">
+  </video>
+
   <div class="container">
     <div class="card">
       <span class="badge">PQC Secured</span>
@@ -31,13 +69,29 @@
       <label>Email</label>
       <input id="email" type="email" placeholder="you@example.com" />
 
+      <!-- Password -->
       <label>Password</label>
-      <input
-        id="password"
-        type="password"
-        placeholder="••••••••"
-        oninput="onPasswordInput(this.value)"
-      />
+      <div class="password-wrapper">
+        <input
+          id="password"
+          type="password"
+          placeholder="••••••••"
+          oninput="onPasswordInput(this.value)"
+        />
+        <span class="toggle-eye" onclick="togglePassword('password')">👁</span>
+      </div>
+
+      <!-- Confirm Password -->
+      <label>Confirm Password</label>
+      <div class="password-wrapper">
+        <input
+          id="confirmPassword"
+          type="password"
+          placeholder="••••••••"
+          oninput="checkConfirmPassword()"
+        />
+        <span class="toggle-eye" onclick="togglePassword('confirmPassword')">👁</span>
+      </div>
 
       <!-- Password rules note -->
       <div class="password-note">
@@ -60,6 +114,7 @@
 
   <script>
     let passwordValid = false;
+    let confirmValid = false;
 
     // -------------------------------
     // PASSWORD INPUT HANDLER
@@ -67,6 +122,7 @@
     function onPasswordInput(pwd) {
       validatePasswordRules(pwd);
       checkPasswordStrength(pwd);
+      checkConfirmPassword();
     }
 
     // -------------------------------
@@ -96,6 +152,34 @@
         input.style.borderColor = "#ef4444";
       } else {
         msg.innerText = "";
+        input.style.borderColor = "";
+      }
+    }
+
+    // -------------------------------
+    // CONFIRM PASSWORD CHECK
+    // -------------------------------
+    function checkConfirmPassword() {
+      const pwd = document.getElementById("password").value;
+      const confirmPwd = document.getElementById("confirmPassword").value;
+      const msg = document.getElementById("msg");
+      const confirmInput = document.getElementById("confirmPassword");
+
+      if (!confirmPwd) {
+        confirmValid = false;
+        confirmInput.style.borderColor = "";
+        return;
+      }
+
+      if (pwd !== confirmPwd) {
+        confirmValid = false;
+        msg.innerText = "Passwords do not match.";
+        msg.className = "msg err";
+        confirmInput.style.borderColor = "#ef4444";
+      } else {
+        confirmValid = true;
+        msg.innerText = "";
+        confirmInput.style.borderColor = "";
       }
     }
 
@@ -104,7 +188,6 @@
     // -------------------------------
     async function checkPasswordStrength(pwd) {
       const text = document.getElementById("strengthText");
-      const input = document.getElementById("password");
 
       if (!pwd) {
         text.innerText = "";
@@ -138,18 +221,25 @@
     }
 
     // -------------------------------
+    // TOGGLE PASSWORD VISIBILITY
+    // -------------------------------
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      input.type = input.type === "password" ? "text" : "password";
+    }
+
+    // -------------------------------
     // SAFE SIGNUP WRAPPER
     // -------------------------------
     function signupWithValidation() {
-      if (!passwordValid) {
+      if (!passwordValid || !confirmValid) {
         const msg = document.getElementById("msg");
         msg.innerText =
-          "Please meet the password requirements before signing up.";
+          "Please meet the password requirements and confirm your password.";
         msg.className = "msg err";
         return;
       }
 
-      // Call existing signup logic (UNCHANGED)
       signup();
     }
   </script>
