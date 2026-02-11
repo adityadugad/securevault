@@ -4,14 +4,15 @@
   <meta charset="UTF-8" />
   <title>SecureVault • PQC Metrics</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <link rel="stylesheet" href="/static/css/style.css" />
 
   <style>
     body {
       margin: 0;
-      overflow: hidden;
       display: flex;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
     }
 
     /* Background Video */
@@ -19,13 +20,27 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       object-fit: cover;
+      z-index: -2;
+    }
+
+    /* Dark overlay for readability */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
       z-index: -1;
     }
 
-    /* Center main content */
+    /* Sidebar remains fixed width */
+    .nav {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Main layout */
     .main {
       flex: 1;
       display: flex;
@@ -33,11 +48,34 @@
       align-items: center;
       justify-content: center;
       padding: 40px;
+      z-index: 2;
     }
 
     .card {
       width: 100%;
-      max-width: 600px;
+      max-width: 650px;
+    }
+
+    /* Proper key-value arrangement */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 20px;
+      margin-top: 20px;
+    }
+
+    .kv {
+      display: contents;
+    }
+
+    .kv span:first-child {
+      color: #9ca3af;
+      text-transform: capitalize;
+    }
+
+    .kv span:last-child {
+      text-align: right;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -45,9 +83,12 @@
 <body onload="requireAuth(); loadPqcMetrics();">
 
   <!-- Background Video -->
-  <video autoplay muted loop class="bg-video">
-    <source src="/static/img/metricsvideo-bg.mp4" type="video/mp4">
+  <video autoplay muted loop playsinline class="bg-video">
+    <source src="/static/img/metricsvideo-bg.mp4?v=1" type="video/mp4">
   </video>
+
+  <!-- Dark Overlay -->
+  <div class="overlay"></div>
 
   <!-- SIDEBAR -->
   <div class="nav">
@@ -69,10 +110,7 @@
 
     <div class="card">
       <h3>CRYSTALS-Kyber Hybrid Metrics</h3>
-
       <div id="metricsBox" class="grid"></div>
-
-      <!-- Hidden message (logic kept, UI hidden) -->
       <div id="pqcMsg" class="msg muted" style="display:none;"></div>
     </div>
   </div>
@@ -118,7 +156,6 @@
       }
     }
 
-    /* Initial load + refresh every 15 minutes */
     loadPqcMetrics();
     setInterval(loadPqcMetrics, 15 * 60 * 1000);
   </script>
