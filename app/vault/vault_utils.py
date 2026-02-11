@@ -15,52 +15,39 @@ BACKUP_AES_KEY = hashlib.sha256(BACKUP_SECRET.encode()).digest()
 
 
 # --------------------------------------------------
-# FETCH PUBLIC KEY FROM KYBER SERVICE
+# ENCAPSULATE (GET AES KEY + KEM CIPHERTEXT FROM KYBER)
 # --------------------------------------------------
 
-def _fetch_public_key():
+def _encapsulate():
     if not KYBER_SERVICE_URL:
-        return None
-
-    try:
-        res = requests.get(f"{KYBER_SERVICE_URL}/public-key", timeout=5)
-        if res.ok:
-            data = res.json()
-            return base64.b64decode(data.get("public_key_b64"))
-    except Exception:
-        pass
-
-    return None
-
-
-# --------------------------------------------------
-# ENCAPSULATE AES KEY USING ML-KEM
-# --------------------------------------------------
-
-def _encapsulate_aes_key(aes_key: bytes):
-    if not KYBER_SERVICE_URL:
-        return None
+        return None, None
 
     try:
         res = requests.post(
             f"{KYBER_SERVICE_URL}/encapsulate",
-            json={"aes_key_b64": base64.b64encode(aes_key).decode()},
             timeout=5
         )
+
         if res.ok:
             data = res.json()
-            return data.get("kem_ciphertext_b64")
+            kem_ciphertext = data.get("kem_ciphertext_b64")
+            aes_key_b64 = data.get("aes_key_b64")
+
+            if kem_ciphertext and aes_key_b64:
+                aes_key = base64.b64decode(aes_key_b64)
+                return kem_ciphertext, aes_key
+
     except Exception:
         pass
 
-    return None
+    return None, None
 
 
 # --------------------------------------------------
-# DECAPSULATE AES KEY USING ML-KEM
+# DECAPSULATE AES KEY
 # --------------------------------------------------
 
-def _decapsulate_aes_key(kem_ciphertext_b64: str):
+def _decapsulate(kem_ciphertext_b64: str):
     if not KYBER_SERVICE_URL:
         raise RuntimeError("Kyber service not configured")
 
@@ -74,7 +61,12 @@ def _decapsulate_aes_key(kem_ciphertext_b64: str):
         raise RuntimeError("Decapsulation failed")
 
     data = res.json()
-    return base64.b64decode(data.get("aes_key_b64"))
+    aes_key_b64 = data.get("aes_key_b64")
+
+    if not aes_key_b64:
+        raise RuntimeError("Invalid decapsulation response")
+
+    return base64.b64decode(aes_key_b64)
 
 
 # --------------------------------------------------
@@ -84,8 +76,17 @@ def _decapsulate_aes_key(kem_ciphertext_b64: str):
 def encrypt_text(plaintext: str) -> dict:
     nonce = os.urandom(12)
 
-    # Generate random AES-256 key per item
-    aes_key = AESGCM.generate_key(bit_length=256)
+    # Try ML-KEM encapsulation first
+    kem_ciphertext_b64, aes_key = _encapsulate()
+
+    if aes_key:
+        encryption_type = "ML-KEM"
+    else:
+        # Fallback to BACKUP mode
+        encryption_type = "BACKUP"
+        aes_key = BACKUP_AES_KEY
+        kem_ciphertext_b64 = None
+
     aesgcm = AESGCM(aes_key)
 
     ciphertext = aesgcm.encrypt(
@@ -93,23 +94,6 @@ def encrypt_text(plaintext: str) -> dict:
         plaintext.encode("utf-8"),
         None
     )
-
-    # Try ML-KEM encapsulation
-    kem_ciphertext_b64 = _encapsulate_aes_key(aes_key)
-
-    if kem_ciphertext_b64:
-        encryption_type = "ML-KEM"
-    else:
-        # Fallback to BACKUP mode
-        encryption_type = "BACKUP"
-        aes_key = BACKUP_AES_KEY
-        aesgcm = AESGCM(aes_key)
-        ciphertext = aesgcm.encrypt(
-            nonce,
-            plaintext.encode("utf-8"),
-            None
-        )
-        kem_ciphertext_b64 = None
 
     return {
         "ciphertext": base64.b64encode(ciphertext).decode(),
@@ -123,7 +107,8 @@ def encrypt_text(plaintext: str) -> dict:
 # DECRYPT (HYBRID MODEL)
 # --------------------------------------------------
 
-def decrypt_text(ciphertext_b64: str, nonce_b64: str,
+def decrypt_text(ciphertext_b64: str,
+                 nonce_b64: str,
                  encryption_type: str,
                  kem_ciphertext_b64: str = None) -> str:
 
@@ -131,7 +116,7 @@ def decrypt_text(ciphertext_b64: str, nonce_b64: str,
     nonce = base64.b64decode(nonce_b64)
 
     if encryption_type == "ML-KEM":
-        aes_key = _decapsulate_aes_key(kem_ciphertext_b64)
+        aes_key = _decapsulate(kem_ciphertext_b64)
 
     elif encryption_type == "BACKUP":
         aes_key = BACKUP_AES_KEY
