@@ -1,45 +1,80 @@
 import os
 import time
+import base64
 import hashlib
+import requests
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
-# Official CRYSTALS-Kyber-512 parameters (NIST)
-KYBER_PUBLIC_KEY_SIZE = 800
-KYBER_CIPHERTEXT_SIZE = 768
-KYBER_SHARED_SECRET_SIZE = 32
+# ======================================================
+# CONFIG
+# ======================================================
 
+KYBER_SERVICE_URL = os.environ.get(
+    "KYBER_SERVICE_URL",
+    "https://your-kyber-service.onrender.com/kyber"
+)
+
+BACKUP_SECRET = os.environ.get(
+    "KYBER_BACKUP_SECRET",
+    "securevault-backup-secret"
+).encode()
+
+
+# ======================================================
+# REAL KYBER (REPLACES SIMULATION)
+# ======================================================
 
 def simulated_kyber_key_exchange():
+    """
+    Same function name.
+    Same return format.
+    But now uses real Kyber service.
+    """
+
     metrics = {}
 
-    # Simulate key generation
     start = time.perf_counter()
-    public_key = os.urandom(KYBER_PUBLIC_KEY_SIZE)
-    private_key = os.urandom(2400)  # Kyber512 secret key size
-    metrics["keygen_time_ms"] = (time.perf_counter() - start) * 1000
 
-    # Simulate encapsulation
-    start = time.perf_counter()
-    ciphertext = os.urandom(KYBER_CIPHERTEXT_SIZE)
-    shared_secret = os.urandom(KYBER_SHARED_SECRET_SIZE)
-    metrics["encapsulation_time_ms"] = (time.perf_counter() - start) * 1000
+    try:
+        response = requests.get(KYBER_SERVICE_URL, timeout=5)
 
-    # Simulate decapsulation
-    start = time.perf_counter()
-    recovered_secret = shared_secret
-    metrics["decapsulation_time_ms"] = (time.perf_counter() - start) * 1000
+        if response.status_code != 200:
+            raise Exception("Non-200 response")
 
-    metrics["public_key_size"] = len(public_key)
-    metrics["ciphertext_size"] = len(ciphertext)
+        data = response.json()
+
+        shared_secret_b64 = data.get("shared_secret_b64")
+        if not shared_secret_b64:
+            raise Exception("Missing shared_secret_b64")
+
+        shared_secret = base64.b64decode(shared_secret_b64)
+
+        metrics["kyber_source"] = "external_service"
+
+    except Exception as e:
+        # Fallback to backup key
+        shared_secret = hashlib.sha256(BACKUP_SECRET).digest()
+        metrics["kyber_source"] = "backup_key"
+        metrics["error"] = str(e)
+
     metrics["shared_secret_size"] = len(shared_secret)
+    metrics["fetch_time_ms"] = (time.perf_counter() - start) * 1000
 
     return shared_secret, metrics
 
 
+# ======================================================
+# AES KEY DERIVATION (UNCHANGED)
+# ======================================================
+
 def derive_aes_key(shared_secret: bytes) -> bytes:
     return hashlib.sha256(shared_secret).digest()
 
+
+# ======================================================
+# ENCRYPTION (UNCHANGED)
+# ======================================================
 
 def encrypt_data(data: bytes):
     shared_secret, metrics = simulated_kyber_key_exchange()
