@@ -102,12 +102,3 @@ def warmup_kyber():
         pass
 
 threading.Thread(target=warmup_kyber, daemon=True).start()
-
-
-@app.route("/sitemap.xml")
-def sitemap():
-    return send_from_directory(".", "sitemap.xml")
-
-@app.get("/robots.txt", include_in_schema=False)
-def robots():
-    return FileResponse("robots.txt")
