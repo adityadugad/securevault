@@ -24,7 +24,7 @@ app = FastAPI(
 # -------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],          # safe because auth is JWT-based
+    allow_origins=["*"],          
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -33,7 +33,6 @@ app.add_middleware(
 # -------------------------------------------------
 # DATABASE INIT (RUNS ON STARTUP)
 # -------------------------------------------------
-# SQLite path comes from env on Render, local fallback otherwise
 os.makedirs(os.path.dirname(os.getenv("DATABASE_PATH", "")), exist_ok=True)
 
 create_tables()
@@ -46,21 +45,8 @@ app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(vault_router, prefix="/vault", tags=["Vault"])
 
 # -------------------------------------------------
-# STATIC FRONTEND (HTML / CSS / JS)
+# STATIC FRONTEND
 # -------------------------------------------------
-# Expected structure:
-# static/
-#   index.html
-#   signup.html
-#   otp.html
-#   dashboard.html
-#   notes.html
-#   todos.html
-#   passwords.html
-#   pqc.html
-#   css/style.css
-#   js/*.js
-#
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # -------------------------------------------------
@@ -71,14 +57,14 @@ def home():
     return FileResponse("static/index.html")
 
 # -------------------------------------------------
-# PQC METRICS API (REAL-TIME)
+# PQC METRICS API
 # -------------------------------------------------
 @app.get("/pqc/metrics", tags=["PQC"])
 def pqc_metrics():
     return get_pqc_metrics()
 
 # -------------------------------------------------
-# HEALTH CHECK (RENDER USES THIS)
+# HEALTH CHECK
 # -------------------------------------------------
 @app.get("/health", tags=["System"])
 def health():
@@ -86,8 +72,9 @@ def health():
         "status": "SecureVault Backend Running",
         "environment": os.getenv("RENDER", "local"),
     }
+
 # -------------------------------------------------
-# KYBER SERVICE WARMUP (RENDER COLD START FIX)
+# KYBER SERVICE WARMUP
 # -------------------------------------------------
 import threading
 import requests
@@ -102,3 +89,11 @@ def warmup_kyber():
         pass
 
 threading.Thread(target=warmup_kyber, daemon=True).start()
+
+
+# -------------------------------------------------
+# SITEMAP (ADDED ONLY THIS PART)
+# -------------------------------------------------
+@app.get("/sitemap.xml", include_in_schema=False)
+def sitemap():
+    return FileResponse("sitemap.xml")
