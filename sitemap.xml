@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://securevault-us40.onrender.com/</loc>
+  </url>
+
+  <url>
+    <loc>https://securevault-us40.onrender.com/login</loc>
+  </url>
+
+  <url>
+    <loc>https://securevault-us40.onrender.com/signup</loc>
+  </url>
+
+  <url>
+    <loc>https://securevault-us40.onrender.com/forgot-password</loc>
+  </url>
+
+  <url>
+    <loc>https://securevault-us40.onrender.com/dashboard</loc>
+  </url>
+
+  <url>
+    <loc>https://securevault-us40.onrender.com/notes</loc>
+  </url>
+
+  <url>
+    <loc>https://securevault-us40.onrender.com/passwords</loc>
+  </url>
+
+  <url>
+    <loc>https://securevault-us40.onrender.com/tasks</loc>
+  </url>
+
+</urlset>
