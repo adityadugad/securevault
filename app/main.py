@@ -97,3 +97,7 @@ threading.Thread(target=warmup_kyber, daemon=True).start()
 @app.get("/sitemap.xml", include_in_schema=False)
 def sitemap():
     return FileResponse("sitemap.xml")
+
+@app.get("/robots.txt", include_in_schema=False)
+def robots():
+    return FileResponse("robots.txt")
