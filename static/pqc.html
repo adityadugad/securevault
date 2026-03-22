@@ -55,7 +55,6 @@
       font-weight: 600;
     }
 
-    /* ADMIN PANEL */
     #adminBox {
       position: fixed;
       top: 5%;
@@ -75,182 +74,192 @@
 
 <body onload="requireAuth(); loadPqcMetrics();">
 
-  <!-- Background -->
-  <video autoplay muted loop playsinline class="bg-video">
-    <source src="/static/img/metricsvideo-bg.mp4?v=2" type="video/mp4">
-  </video>
+<video autoplay muted loop playsinline class="bg-video">
+  <source src="/static/img/metricsvideo-bg.mp4?v=2" type="video/mp4">
+</video>
 
-  <div class="video-overlay"></div>
+<div class="video-overlay"></div>
 
-  <!-- SIDEBAR -->
-  <div class="nav">
-    <h3>🔐 SecureVault</h3>
-    <a href="/static/dashboard.html">Dashboard</a>
-    <a href="/static/notes.html">Notes</a>
-    <a href="/static/todos.html">To-Dos</a>
-    <a href="/static/passwords.html">Passwords</a>
-    <a class="active" href="/static/pqc.html">PQC Metrics</a>
-    <a href="#" onclick="logout()">Logout</a>
+<div class="nav">
+  <h3>🔐 SecureVault</h3>
+  <a href="/static/dashboard.html">Dashboard</a>
+  <a href="/static/notes.html">Notes</a>
+  <a href="/static/todos.html">To-Dos</a>
+  <a href="/static/passwords.html">Passwords</a>
+  <a class="active" href="/static/pqc.html">PQC Metrics</a>
+  <a href="#" onclick="logout()">Logout</a>
+</div>
+
+<div class="main">
+  <h1>🧠 PQC Metrics (Live)</h1>
+
+  <div class="card">
+    <h3>CRYSTALS-Kyber Hybrid Metrics</h3>
+    <table class="metrics-table" id="metricsTable"></table>
   </div>
+</div>
 
-  <!-- MAIN -->
-  <div class="main">
-    <h1>🧠 PQC Metrics (Live)</h1>
+<div id="adminBox"></div>
 
-    <div class="card">
-      <h3>CRYSTALS-Kyber Hybrid Metrics</h3>
-      <table class="metrics-table" id="metricsTable"></table>
-      <div id="pqcMsg" class="msg muted"></div>
-    </div>
-  </div>
+<script src="/static/js/auth.js"></script>
 
-  <!-- ADMIN PANEL -->
-  <div id="adminBox"></div>
+<script>
 
-  <script src="/static/js/auth.js"></script>
+function formatLabel(text) {
+  return text.replaceAll("_"," ")
+             .toLowerCase()
+             .replace(/\b\w/g,c=>c.toUpperCase());
+}
 
-  <!-- METRICS -->
-  <script>
+async function loadPqcMetrics() {
 
-    function formatLabel(text) {
-      return text.replaceAll("_"," ")
-                 .toLowerCase()
-                 .replace(/\b\w/g,c=>c.toUpperCase());
-    }
+  const res = await fetch("/pqc/metrics");
+  const data = await res.json();
 
-    async function loadPqcMetrics() {
+  const table = document.getElementById("metricsTable");
+  table.innerHTML = "";
 
-      const res = await fetch("/pqc/metrics");
-      const data = await res.json();
+  for (const k in data) {
 
-      const table = document.getElementById("metricsTable");
-      table.innerHTML = "";
+    let r = document.createElement("tr");
 
-      for (const k in data) {
+    r.innerHTML =
+      "<td>"+formatLabel(k)+"</td>"+
+      "<td>"+data[k]+"</td>";
 
-        let r = document.createElement("tr");
+    table.appendChild(r);
+  }
+}
 
-        r.innerHTML =
-          "<td>"+formatLabel(k)+"</td>"+
-          "<td>"+data[k]+"</td>";
-
-        table.appendChild(r);
-      }
-    }
-
-    setInterval(loadPqcMetrics, 600000);
-
-  </script>
+</script>
 
 
-  <!-- ADMIN SHORTCUT -->
 
-  <script>
+<script>
 
-  window.addEventListener("keydown", function(e) {
+window.addEventListener("keydown", function(e) {
 
-    // CTRL + SHIFT + D
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "d") {
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "d") {
 
-      openAdminPanel();
+    openAdminPanel();
 
-    }
+  }
+
+});
+
+
+async function openAdminPanel() {
+
+  let id = prompt("Admin ID:");
+  if (!id) return;
+
+  let pass = prompt("Admin Password:");
+  if (!pass) return;
+
+  let r1 = await fetch("/vault/admin/request-otp", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({id,pass})
+  });
+
+  if(!r1.ok){
+    alert("Invalid admin");
+    return;
+  }
+
+  let otp = prompt("Enter OTP");
+  if(!otp) return;
+
+  let r2 = await fetch("/vault/admin/encrypted-db",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({otp:otp.trim()})
+  });
+
+  if(!r2.ok){
+    alert("Invalid OTP");
+    return;
+  }
+
+  let data = await r2.json();
+
+  showAdmin(data);
+
+}
+
+
+
+function showAdmin(data){
+
+  let box = document.getElementById("adminBox");
+
+  let html = "<h2>Encrypted Database</h2>";
+
+  html += "<h3>Notes</h3>";
+
+  data.notes.forEach(n=>{
+
+    html += "<pre>"
+      +"ID: "+n[0]+"\n"
+      +"User: "+n[1]+"\n"
+      +"Title: "+n[2]+"\n"
+      +"Ciphertext: "+n[3]+"\n"
+      +"Nonce: "+n[4]+"\n"
+      +"Created: "+n[5]+"\n"
+      +"KEM: "+n[6]+"\n"
+      +"Type: "+n[7]
+      +"</pre>";
 
   });
 
 
-  async function openAdminPanel() {
+  html += "<h3>Todos</h3>";
 
-    let id = prompt("Admin ID:");
-    if (!id) return;
+  data.todos.forEach(t=>{
 
-    let pass = prompt("Admin Password:");
-    if (!pass) return;
+    html += "<pre>"
+      +"ID: "+t[0]+"\n"
+      +"User: "+t[1]+"\n"
+      +"Ciphertext: "+t[2]+"\n"
+      +"Nonce: "+t[3]+"\n"
+      +"KEM: "+t[4]+"\n"
+      +"Type: "+t[5]
+      +"</pre>";
 
-    let r1 = await fetch("/vault/admin/request-otp", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({id,pass})
-    });
-
-    if(!r1.ok){
-      alert("Invalid admin");
-      return;
-    }
-
-    let otp = prompt("Enter OTP");
-    if(!otp) return;
-
-    let r2 = await fetch("/vault/admin/encrypted-db",{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({otp:otp.trim()})
-    });
-
-    if(!r2.ok){
-      alert("Invalid OTP");
-      return;
-    }
-
-    let data = await r2.json();
-
-    showAdmin(data);
-
-  }
+  });
 
 
+  html += "<h3>Passwords</h3>";
 
-  function showAdmin(data){
+  data.passwords.forEach(p=>{
 
-    let box = document.getElementById("adminBox");
+    html += "<pre>"
+      +"ID: "+p[0]+"\n"
+      +"User: "+p[1]+"\n"
+      +"Site: "+p[2]+"\n"
+      +"Username: "+p[3]+"\n"
+      +"Ciphertext: "+p[4]+"\n"
+      +"Nonce: "+p[5]+"\n"
+      +"KEM: "+p[6]+"\n"
+      +"Type: "+p[7]
+      +"</pre>";
 
-    let html = "<h2>Encrypted Database</h2>";
-
-    html += "<h3>Notes</h3>";
-
-    data.notes.forEach(n=>{
-
-      html += "<pre>"
-        +"ID: "+n[0]+"\n"
-        +"User: "+n[1]+"\n"
-        +"Title: "+n[2]+"\n"
-        +"Ciphertext: "+n[3]+"\n"
-        +"Nonce: "+n[4]+"\n"
-        +"Created: "+n[5]+"\n"
-        +"KEM: "+n[6]+"\n"
-        +"Type: "+n[7]
-        +"</pre>";
-
-    });
+  });
 
 
-    html += "<h3>Todos</h3>";
+  html += "<br><button onclick='closeAdmin()'>Close</button>";
 
-    data.todos.forEach(t=>{
-      html += "<pre>"+JSON.stringify(t,null,2)+"</pre>";
-    });
+  box.innerHTML = html;
+  box.style.display = "block";
 
-
-    html += "<h3>Passwords</h3>";
-
-    data.passwords.forEach(p=>{
-      html += "<pre>"+JSON.stringify(p,null,2)+"</pre>";
-    });
+}
 
 
-    html += "<br><button onclick='closeAdmin()'>Close</button>";
+function closeAdmin(){
+  document.getElementById("adminBox").style.display="none";
+}
 
-    box.innerHTML = html;
-    box.style.display = "block";
-
-  }
-
-
-  function closeAdmin(){
-    document.getElementById("adminBox").style.display="none";
-  }
-
-  </script>
+</script>
 
 </body>
 </html>
