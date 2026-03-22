@@ -337,7 +337,7 @@ def admin_request_otp(data: dict):
 
 
 # =========================================================
-# ADMIN → VIEW ENCRYPTED DB (FORMATTED)
+# ADMIN → VIEW ENCRYPTED DB (FIXED INDEXES ONLY)
 # =========================================================
 
 def fake_kem():
@@ -376,7 +376,7 @@ def admin_encrypted_db(data: dict):
             "kem": kem,
             "kem_used": "YES",
             "type": "HYBRID (AES+Kyber512)",
-            "created": r[-1],
+            "created": r[7],
         })
 
     todos = []
@@ -390,12 +390,12 @@ def admin_encrypted_db(data: dict):
             "kem": kem,
             "kem_used": "YES",
             "type": "HYBRID (AES+Kyber512)",
-            "created": r[-1],
+            "created": r[6],
         })
 
     passwords = []
     for r in prows:
-        kem = r[5] if r[5] else fake_kem()
+        kem = r[6] if r[6] else fake_kem()
         passwords.append({
             "id": r[0],
             "user": r[1],
@@ -404,7 +404,7 @@ def admin_encrypted_db(data: dict):
             "kem": kem,
             "kem_used": "YES",
             "type": "HYBRID (AES+Kyber512)",
-            "created": r[-1],
+            "created": r[8],
         })
 
     return {
