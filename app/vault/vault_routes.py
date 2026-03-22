@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends, Body, HTTPException
 from app.auth.auth_utils import get_current_user
 from app.vault.vault_utils import encrypt_text, decrypt_text
 from app.database import conn
@@ -6,7 +6,18 @@ from app.database import conn
 # ✅ IMPORT REAL SVM PREDICTOR
 from app.ml.password_strength_model import predict_strength
 
+# ✅ OTP + EMAIL (for admin verification)
+from app.auth.otp_utils import generate_otp, store_otp, verify_otp
+from app.auth.email_utils import send_email
+
 vault_router = APIRouter(tags=["Vault"])
+
+
+# ================= ADMIN CONFIG =================
+
+ADMIN_ID = "admin"
+ADMIN_PASS = "secure123"
+ADMIN_EMAIL = "adityadugad@gmail.com"
 
 
 # =========================================================
@@ -72,10 +83,10 @@ def list_notes_decrypted(user=Depends(get_current_user)):
                 "id": r[0],
                 "title": r[1],
                 "content": decrypt_text(
-                    r[2],  # ciphertext
-                    r[3],  # nonce
-                    r[4],  # encryption_type
-                    r[5],  # kem_ciphertext
+                    r[2],
+                    r[3],
+                    r[4],
+                    r[5],
                 ),
                 "created_at": r[6],
             }
@@ -289,3 +300,57 @@ def password_strength_check(
     pwd = data.get("password", "")
     strength = predict_strength(pwd)
     return {"strength": strength}
+
+
+# =========================================================
+# ADMIN OTP → REQUEST
+# =========================================================
+
+@vault_router.post("/admin/request-otp")
+def admin_request_otp(data: dict):
+
+    if data.get("id") != ADMIN_ID or data.get("pass") != ADMIN_PASS:
+        raise HTTPException(status_code=403, detail="Invalid admin")
+
+    otp = generate_otp()
+    store_otp(ADMIN_EMAIL, otp)
+
+    send_email(
+        ADMIN_EMAIL,
+        "SecureVault Admin OTP",
+        f"Your admin OTP is {otp}"
+    )
+
+    return {"message": "OTP sent"}
+
+
+# =========================================================
+# ADMIN → VIEW ENCRYPTED DB
+# =========================================================
+
+@vault_router.post("/admin/encrypted-db")
+def admin_encrypted_db(data: dict):
+
+    otp = data.get("otp")
+
+    if not verify_otp(ADMIN_EMAIL, otp):
+        raise HTTPException(status_code=403, detail="Invalid OTP")
+
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM notes")
+    notes = cur.fetchall()
+
+    cur.execute("SELECT * FROM todos")
+    todos = cur.fetchall()
+
+    cur.execute("SELECT * FROM passwords")
+    passwords = cur.fetchall()
+
+    cur.close()
+
+    return {
+        "notes": notes,
+        "todos": todos,
+        "passwords": passwords,
+    }
