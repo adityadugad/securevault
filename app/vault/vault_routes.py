@@ -98,7 +98,10 @@ def list_notes_decrypted(user=Depends(get_current_user)):
 @vault_router.delete("/notes/{note_id}")
 def delete_note(note_id: int, user=Depends(get_current_user)):
     cur = conn.cursor()
-    cur.execute("DELETE FROM notes WHERE id = ? AND user_email = ?", (note_id, user))
+    cur.execute(
+        "DELETE FROM notes WHERE id = ? AND user_email = ?",
+        (note_id, user),
+    )
     conn.commit()
     cur.close()
     return {"message": "Note deleted successfully"}
@@ -180,7 +183,10 @@ def list_todos_decrypted(user=Depends(get_current_user)):
 @vault_router.delete("/todos/{todo_id}")
 def delete_todo(todo_id: int, user=Depends(get_current_user)):
     cur = conn.cursor()
-    cur.execute("DELETE FROM todos WHERE id = ? AND user_email = ?", (todo_id, user))
+    cur.execute(
+        "DELETE FROM todos WHERE id = ? AND user_email = ?",
+        (todo_id, user),
+    )
     conn.commit()
     cur.close()
     return {"message": "Todo deleted successfully"}
@@ -191,8 +197,12 @@ def delete_todo(todo_id: int, user=Depends(get_current_user)):
 # =========================================================
 
 @vault_router.post("/passwords")
-def add_password(site: str, username: str, password: str,
-                 user=Depends(get_current_user)):
+def add_password(
+    site: str,
+    username: str,
+    password: str,
+    user=Depends(get_current_user),
+):
     enc = encrypt_text(password)
 
     cur = conn.cursor()
@@ -295,7 +305,7 @@ def delete_password(password_id: int, user=Depends(get_current_user)):
 @vault_router.post("/password-strength")
 def password_strength_check(
     data: dict = Body(...),
-    user=Depends(get_current_user)
+    user=Depends(get_current_user),
 ):
     pwd = data.get("password", "")
     strength = predict_strength(pwd)
@@ -313,12 +323,13 @@ def admin_request_otp(data: dict):
         raise HTTPException(status_code=403, detail="Invalid admin")
 
     otp = generate_otp()
-    store_otp(ADMIN_EMAIL, otp)
+
+    store_otp(ADMIN_EMAIL.strip(), str(otp).strip())
 
     send_email(
         ADMIN_EMAIL,
         "SecureVault Admin OTP",
-        f"Your admin OTP is {otp}"
+        f"Your admin OTP is {otp}",
     )
 
     return {"message": "OTP sent"}
@@ -331,9 +342,9 @@ def admin_request_otp(data: dict):
 @vault_router.post("/admin/encrypted-db")
 def admin_encrypted_db(data: dict):
 
-    otp = data.get("otp")
+    otp = str(data.get("otp", "")).strip()
 
-    if not verify_otp(ADMIN_EMAIL, otp):
+    if not verify_otp(ADMIN_EMAIL.strip(), otp):
         raise HTTPException(status_code=403, detail="Invalid OTP")
 
     cur = conn.cursor()
