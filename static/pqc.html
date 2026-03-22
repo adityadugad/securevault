@@ -93,9 +93,10 @@
     </div>
   </div>
 
-  <!-- SCRIPTS -->
+  <!-- AUTH -->
   <script src="/static/js/auth.js"></script>
 
+  <!-- METRICS SCRIPT -->
   <script>
     function formatLabel(text) {
       return text
@@ -149,16 +150,21 @@
 
   <script>
 
-  document.addEventListener("keydown", async function(e) {
+  console.log("Admin shortcut loaded");
 
-    if (e.ctrlKey && e.altKey && e.key.toLowerCase() === "a") {
+  window.addEventListener("keydown", async function(e) {
+
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "a") {
+
+      console.log("Shortcut detected");
 
       try {
 
         let id = prompt("Admin ID:");
-        let pass = prompt("Admin Password:");
+        if (!id) return;
 
-        if (!id || !pass) return;
+        let pass = prompt("Admin Password:");
+        if (!pass) return;
 
         let r1 = await fetch("/vault/admin/request-otp", {
           method: "POST",
@@ -172,7 +178,6 @@
         }
 
         let otp = prompt("Enter OTP sent to admin email");
-
         if (!otp) return;
 
         let r2 = await fetch("/vault/admin/encrypted-db", {
@@ -196,6 +201,7 @@
       } catch (err) {
 
         alert("Admin panel error");
+        console.error(err);
 
       }
 
