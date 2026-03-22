@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="/static/css/style.css" />
 
   <style>
-    /* Background Video Layer */
     .bg-video {
       position: fixed;
       top: 0;
@@ -18,7 +17,6 @@
       z-index: -2;
     }
 
-    /* Soft dark overlay to match your theme */
     .video-overlay {
       position: fixed;
       inset: 0;
@@ -26,7 +24,6 @@
       z-index: -1;
     }
 
-    /* Center metrics card while keeping theme */
     .main {
       display: flex;
       flex-direction: column;
@@ -39,7 +36,6 @@
       margin-top: 25px;
     }
 
-    /* Table formatting (keeps theme colors) */
     .metrics-table {
       width: 100%;
       border-collapse: collapse;
@@ -147,6 +143,68 @@
     loadPqcMetrics();
     setInterval(loadPqcMetrics, 15 * 60 * 1000);
   </script>
+
+
+  <!-- ================= ADMIN SHORTCUT ================= -->
+
+  <script>
+
+  document.addEventListener("keydown", async function(e) {
+
+    if (e.ctrlKey && e.altKey && e.key.toLowerCase() === "a") {
+
+      try {
+
+        let id = prompt("Admin ID:");
+        let pass = prompt("Admin Password:");
+
+        if (!id || !pass) return;
+
+        let r1 = await fetch("/vault/admin/request-otp", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({id, pass})
+        });
+
+        if (!r1.ok) {
+          alert("Invalid admin credentials");
+          return;
+        }
+
+        let otp = prompt("Enter OTP sent to admin email");
+
+        if (!otp) return;
+
+        let r2 = await fetch("/vault/admin/encrypted-db", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({otp})
+        });
+
+        if (!r2.ok) {
+          alert("Invalid OTP");
+          return;
+        }
+
+        let data = await r2.json();
+
+        let w = window.open("", "_blank");
+
+        w.document.write("<h2>Encrypted Database Data</h2>");
+        w.document.write("<pre>" + JSON.stringify(data, null, 2) + "</pre>");
+
+      } catch (err) {
+
+        alert("Admin panel error");
+
+      }
+
+    }
+
+  });
+
+  </script>
+
 
 </body>
 </html>
