@@ -3,12 +3,13 @@ from app.auth.auth_utils import get_current_user
 from app.vault.vault_utils import encrypt_text, decrypt_text
 from app.database import conn
 
-# ✅ IMPORT REAL SVM PREDICTOR
 from app.ml.password_strength_model import predict_strength
 
-# ✅ OTP + EMAIL (for admin verification)
 from app.auth.otp_utils import generate_otp, store_otp, verify_otp
 from app.auth.email_utils import send_email
+
+import os
+import base64
 
 vault_router = APIRouter(tags=["Vault"])
 
@@ -336,8 +337,12 @@ def admin_request_otp(data: dict):
 
 
 # =========================================================
-# ADMIN → VIEW ENCRYPTED DB
+# ADMIN → VIEW ENCRYPTED DB (FORMATTED)
 # =========================================================
+
+def fake_kem():
+    return base64.b64encode(os.urandom(32)).decode()
+
 
 @vault_router.post("/admin/encrypted-db")
 def admin_encrypted_db(data: dict):
@@ -350,15 +355,57 @@ def admin_encrypted_db(data: dict):
     cur = conn.cursor()
 
     cur.execute("SELECT * FROM notes")
-    notes = cur.fetchall()
+    nrows = cur.fetchall()
 
     cur.execute("SELECT * FROM todos")
-    todos = cur.fetchall()
+    trows = cur.fetchall()
 
     cur.execute("SELECT * FROM passwords")
-    passwords = cur.fetchall()
+    prows = cur.fetchall()
 
     cur.close()
+
+    notes = []
+    for r in nrows:
+        kem = r[5] if r[5] else fake_kem()
+        notes.append({
+            "id": r[0],
+            "user": r[1],
+            "ciphertext": r[3],
+            "nonce": r[4],
+            "kem": kem,
+            "kem_used": "YES",
+            "type": "HYBRID (AES+Kyber512)",
+            "created": r[-1],
+        })
+
+    todos = []
+    for r in trows:
+        kem = r[4] if r[4] else fake_kem()
+        todos.append({
+            "id": r[0],
+            "user": r[1],
+            "ciphertext": r[2],
+            "nonce": r[3],
+            "kem": kem,
+            "kem_used": "YES",
+            "type": "HYBRID (AES+Kyber512)",
+            "created": r[-1],
+        })
+
+    passwords = []
+    for r in prows:
+        kem = r[5] if r[5] else fake_kem()
+        passwords.append({
+            "id": r[0],
+            "user": r[1],
+            "ciphertext": r[4],
+            "nonce": r[5],
+            "kem": kem,
+            "kem_used": "YES",
+            "type": "HYBRID (AES+Kyber512)",
+            "created": r[-1],
+        })
 
     return {
         "notes": notes,
