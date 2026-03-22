@@ -200,14 +200,14 @@ function showAdmin(data){
   data.notes.forEach(n=>{
 
     html += "<pre>"
-      +"ID: "+n[0]+"\n"
-      +"User: "+n[1]+"\n"
-      +"Title: "+n[2]+"\n"
-      +"Ciphertext: "+n[3]+"\n"
-      +"Nonce: "+n[4]+"\n"
-      +"Created: "+n[5]+"\n"
-      +"KEM: "+n[6]+"\n"
-      +"Type: "+n[7]
+      +"ID: "+n.id+"\n"
+      +"User: "+n.user+"\n"
+      +"Ciphertext: "+n.ciphertext+"\n"
+      +"Nonce: "+n.nonce+"\n"
+      +"KEM Used: "+n.kem_used+"\n"
+      +"Kyber Ciphertext: "+n.kem+"\n"
+      +"Type: "+n.type+"\n"
+      +"Created: "+n.created
       +"</pre>";
 
   });
@@ -218,12 +218,14 @@ function showAdmin(data){
   data.todos.forEach(t=>{
 
     html += "<pre>"
-      +"ID: "+t[0]+"\n"
-      +"User: "+t[1]+"\n"
-      +"Ciphertext: "+t[2]+"\n"
-      +"Nonce: "+t[3]+"\n"
-      +"KEM: "+t[4]+"\n"
-      +"Type: "+t[5]
+      +"ID: "+t.id+"\n"
+      +"User: "+t.user+"\n"
+      +"Ciphertext: "+t.ciphertext+"\n"
+      +"Nonce: "+t.nonce+"\n"
+      +"KEM Used: "+t.kem_used+"\n"
+      +"Kyber Ciphertext: "+t.kem+"\n"
+      +"Type: "+t.type+"\n"
+      +"Created: "+t.created
       +"</pre>";
 
   });
@@ -234,14 +236,14 @@ function showAdmin(data){
   data.passwords.forEach(p=>{
 
     html += "<pre>"
-      +"ID: "+p[0]+"\n"
-      +"User: "+p[1]+"\n"
-      +"Site: "+p[2]+"\n"
-      +"Username: "+p[3]+"\n"
-      +"Ciphertext: "+p[4]+"\n"
-      +"Nonce: "+p[5]+"\n"
-      +"KEM: "+p[6]+"\n"
-      +"Type: "+p[7]
+      +"ID: "+p.id+"\n"
+      +"User: "+p.user+"\n"
+      +"Ciphertext: "+p.ciphertext+"\n"
+      +"Nonce: "+p.nonce+"\n"
+      +"KEM Used: "+p.kem_used+"\n"
+      +"Kyber Ciphertext: "+p.kem+"\n"
+      +"Type: "+p.type+"\n"
+      +"Created: "+p.created
       +"</pre>";
 
   });
