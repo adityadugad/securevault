@@ -8,9 +8,7 @@
   <!-- Modern theme -->
   <link rel="stylesheet" href="/static/css/style.css" />
 
-  <!-- HTML-only background video + scroll fix -->
   <style>
-    /* Allow page to scroll when content exceeds viewport */
     html, body {
       height: 100%;
       overflow-y: auto;
@@ -26,22 +24,19 @@
       pointer-events: none;
     }
 
-    /* Lift all page content ABOVE the video */
     body > *:not(.bg-video) {
       position: relative;
       z-index: 1;
     }
 
-    /* Ensure container can grow naturally */
     .container {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px 0; /* allows scroll padding */
+      padding: 24px 0;
     }
 
-    /* Forgot password link */
     .forgot-link {
       display: block;
       margin-top: 10px;
@@ -50,6 +45,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- BACKGROUND VIDEO -->
@@ -60,6 +56,7 @@
   <!-- CONTENT -->
   <div class="container">
     <div class="card">
+
       <div class="brand">
         <span class="badge">PQC Secured</span>
       </div>
@@ -73,9 +70,9 @@
       <label>Password</label>
       <input type="password" id="password" placeholder="••••••••" />
 
-      <button class="btn" onclick="login()">Login</button>
+      <!-- LOGIN BUTTON -->
+      <button class="btn" onclick="loginWithWake()">Login</button>
 
-      <!-- Forgot Password -->
       <a href="/static/forgot-password.html" class="forgot-link muted">
         Forgot password?
       </a>
@@ -87,12 +84,14 @@
       </div>
 
       <div id="msg" class="msg"></div>
+
     </div>
   </div>
 
+  <!-- AUTH JS (unchanged) -->
   <script src="/static/js/auth.js"></script>
 
-  <!-- Slow Video Playback -->
+  <!-- Slow video -->
   <script>
     window.addEventListener("load", function () {
       const video = document.getElementById("bgVideo");
@@ -100,6 +99,36 @@
         video.playbackRate = 0.7;
       }
     });
+  </script>
+
+
+  <!-- ✅ WAKE REQUEST + LOGIN WRAPPER -->
+  <script>
+
+  async function loginWithWake() {
+
+    try {
+
+      // wake render backend
+      fetch("https://pqc-dashboard.onrender.com/", {
+        method: "GET",
+        mode: "no-cors"
+      }).catch(() => {});
+
+      // small delay for cold start
+      await new Promise(r => setTimeout(r, 800));
+
+      // call original login function
+      login();
+
+    } catch (e) {
+
+      login();
+
+    }
+
+  }
+
   </script>
 
 </body>
