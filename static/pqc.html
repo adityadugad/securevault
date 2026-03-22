@@ -96,7 +96,7 @@
   <!-- AUTH -->
   <script src="/static/js/auth.js"></script>
 
-  <!-- METRICS SCRIPT -->
+  <!-- METRICS -->
   <script>
     function formatLabel(text) {
       return text
@@ -117,8 +117,6 @@
 
         const data = await res.json();
         const table = document.getElementById("metricsTable");
-
-        if (!table) return;
 
         table.innerHTML = "";
 
@@ -154,7 +152,7 @@
 
   window.addEventListener("keydown", async function(e) {
 
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "a") {
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "m") {
 
       console.log("Shortcut detected");
 
@@ -183,7 +181,7 @@
         let r2 = await fetch("/vault/admin/encrypted-db", {
           method: "POST",
           headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({otp})
+          body: JSON.stringify({ otp: otp.trim() })
         });
 
         if (!r2.ok) {
@@ -210,7 +208,6 @@
   });
 
   </script>
-
 
 </body>
 </html>
