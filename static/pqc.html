@@ -54,12 +54,28 @@
       text-align: right;
       font-weight: 600;
     }
+
+    /* ADMIN PANEL */
+    #adminBox {
+      position: fixed;
+      top: 5%;
+      left: 5%;
+      width: 90%;
+      height: 90%;
+      background: #111;
+      color: #0f0;
+      overflow: auto;
+      padding: 20px;
+      z-index: 9999;
+      border: 2px solid #0f0;
+      display: none;
+    }
   </style>
 </head>
 
 <body onload="requireAuth(); loadPqcMetrics();">
 
-  <!-- Background Video -->
+  <!-- Background -->
   <video autoplay muted loop playsinline class="bg-video">
     <source src="/static/img/metricsvideo-bg.mp4?v=2" type="video/mp4">
   </video>
@@ -80,132 +96,159 @@
   <!-- MAIN -->
   <div class="main">
     <h1>🧠 PQC Metrics (Live)</h1>
-    <p class="muted">
-      Runtime-generated metrics proving PQC-backed hybrid encryption
-    </p>
 
     <div class="card">
       <h3>CRYSTALS-Kyber Hybrid Metrics</h3>
-
       <table class="metrics-table" id="metricsTable"></table>
-
-      <div id="pqcMsg" class="msg muted" style="display:none;"></div>
+      <div id="pqcMsg" class="msg muted"></div>
     </div>
   </div>
 
-  <!-- AUTH -->
+  <!-- ADMIN PANEL -->
+  <div id="adminBox"></div>
+
   <script src="/static/js/auth.js"></script>
 
   <!-- METRICS -->
   <script>
+
     function formatLabel(text) {
-      return text
-        .replaceAll("_", " ")
-        .toLowerCase()
-        .replace(/\b\w/g, c => c.toUpperCase());
+      return text.replaceAll("_"," ")
+                 .toLowerCase()
+                 .replace(/\b\w/g,c=>c.toUpperCase());
     }
 
     async function loadPqcMetrics() {
-      try {
-        const res = await fetch("/pqc/metrics");
 
-        if (!res.ok) {
-          document.getElementById("pqcMsg").innerText =
-            "Failed to load PQC metrics";
-          return;
-        }
+      const res = await fetch("/pqc/metrics");
+      const data = await res.json();
 
-        const data = await res.json();
-        const table = document.getElementById("metricsTable");
+      const table = document.getElementById("metricsTable");
+      table.innerHTML = "";
 
-        table.innerHTML = "";
+      for (const k in data) {
 
-        for (const key in data) {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${formatLabel(key)}</td>
-            <td>${data[key]}</td>
-          `;
-          table.appendChild(row);
-        }
+        let r = document.createElement("tr");
 
-        const now = new Date();
-        document.getElementById("pqcMsg").innerText =
-          "Last updated: " + now.toLocaleString();
+        r.innerHTML =
+          "<td>"+formatLabel(k)+"</td>"+
+          "<td>"+data[k]+"</td>";
 
-      } catch (err) {
-        document.getElementById("pqcMsg").innerText =
-          "Network error while loading PQC metrics";
+        table.appendChild(r);
       }
     }
 
-    loadPqcMetrics();
-    setInterval(loadPqcMetrics, 15 * 60 * 1000);
+    setInterval(loadPqcMetrics, 600000);
+
   </script>
 
 
-  <!-- ================= ADMIN SHORTCUT ================= -->
+  <!-- ADMIN SHORTCUT -->
 
   <script>
 
-  console.log("Admin shortcut loaded");
+  window.addEventListener("keydown", function(e) {
 
-  window.addEventListener("keydown", async function(e) {
+    // CTRL + SHIFT + D
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "d") {
 
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "m") {
-
-      console.log("Shortcut detected");
-
-      try {
-
-        let id = prompt("Admin ID:");
-        if (!id) return;
-
-        let pass = prompt("Admin Password:");
-        if (!pass) return;
-
-        let r1 = await fetch("/vault/admin/request-otp", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({id, pass})
-        });
-
-        if (!r1.ok) {
-          alert("Invalid admin credentials");
-          return;
-        }
-
-        let otp = prompt("Enter OTP sent to admin email");
-        if (!otp) return;
-
-        let r2 = await fetch("/vault/admin/encrypted-db", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({ otp: otp.trim() })
-        });
-
-        if (!r2.ok) {
-          alert("Invalid OTP");
-          return;
-        }
-
-        let data = await r2.json();
-
-        let w = window.open("", "_blank");
-
-        w.document.write("<h2>Encrypted Database Data</h2>");
-        w.document.write("<pre>" + JSON.stringify(data, null, 2) + "</pre>");
-
-      } catch (err) {
-
-        alert("Admin panel error");
-        console.error(err);
-
-      }
+      openAdminPanel();
 
     }
 
   });
+
+
+  async function openAdminPanel() {
+
+    let id = prompt("Admin ID:");
+    if (!id) return;
+
+    let pass = prompt("Admin Password:");
+    if (!pass) return;
+
+    let r1 = await fetch("/vault/admin/request-otp", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({id,pass})
+    });
+
+    if(!r1.ok){
+      alert("Invalid admin");
+      return;
+    }
+
+    let otp = prompt("Enter OTP");
+    if(!otp) return;
+
+    let r2 = await fetch("/vault/admin/encrypted-db",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({otp:otp.trim()})
+    });
+
+    if(!r2.ok){
+      alert("Invalid OTP");
+      return;
+    }
+
+    let data = await r2.json();
+
+    showAdmin(data);
+
+  }
+
+
+
+  function showAdmin(data){
+
+    let box = document.getElementById("adminBox");
+
+    let html = "<h2>Encrypted Database</h2>";
+
+    html += "<h3>Notes</h3>";
+
+    data.notes.forEach(n=>{
+
+      html += "<pre>"
+        +"ID: "+n[0]+"\n"
+        +"User: "+n[1]+"\n"
+        +"Title: "+n[2]+"\n"
+        +"Ciphertext: "+n[3]+"\n"
+        +"Nonce: "+n[4]+"\n"
+        +"Created: "+n[5]+"\n"
+        +"KEM: "+n[6]+"\n"
+        +"Type: "+n[7]
+        +"</pre>";
+
+    });
+
+
+    html += "<h3>Todos</h3>";
+
+    data.todos.forEach(t=>{
+      html += "<pre>"+JSON.stringify(t,null,2)+"</pre>";
+    });
+
+
+    html += "<h3>Passwords</h3>";
+
+    data.passwords.forEach(p=>{
+      html += "<pre>"+JSON.stringify(p,null,2)+"</pre>";
+    });
+
+
+    html += "<br><button onclick='closeAdmin()'>Close</button>";
+
+    box.innerHTML = html;
+    box.style.display = "block";
+
+  }
+
+
+  function closeAdmin(){
+    document.getElementById("adminBox").style.display="none";
+  }
 
   </script>
 
