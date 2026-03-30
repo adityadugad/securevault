@@ -3,11 +3,60 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# ======================================================
+# JWT CONFIG
+# ======================================================
+
 JWT_SECRET = os.getenv("JWT_SECRET")
 JWT_EXP_MINUTES = int(os.getenv("JWT_EXP_MINUTES", 15))
 
-# 🔐 External Kyber Service
-KYBER_SERVICE_URL = os.getenv("KYBER_SERVICE_URL", "")
-
 if not JWT_SECRET:
     raise RuntimeError("JWT_SECRET is not set in environment variables")
+
+# ======================================================
+# KYBER SERVICE
+# ======================================================
+
+KYBER_SERVICE_URL = os.getenv("KYBER_SERVICE_URL", "")
+
+# ======================================================
+# ADMIN CONFIG
+# ======================================================
+
+ADMIN_ID = os.getenv("ADMIN_ID")
+ADMIN_PASS = os.getenv("ADMIN_PASS")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
+
+# ======================================================
+# FRONTEND / CORS
+# ======================================================
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "*")
+
+# ======================================================
+# SECURITY LIMITS
+# ======================================================
+
+MAX_FAILED_LOGIN_ATTEMPTS = int(
+    os.getenv("MAX_FAILED_LOGIN_ATTEMPTS", 5)
+)
+
+MAX_WRONG_OTP_ATTEMPTS = int(
+    os.getenv("MAX_WRONG_OTP_ATTEMPTS", 3)
+)
+
+LOGIN_LOCK_MINUTES = int(
+    os.getenv("LOGIN_LOCK_MINUTES", 10)
+)
+
+OTP_LOCK_MINUTES = int(
+    os.getenv("OTP_LOCK_MINUTES", 5)
+)
+
+ADMIN_LOCK_MINUTES = int(
+    os.getenv("ADMIN_LOCK_MINUTES", 15)
+)
+
+DECRYPT_LOCK_MINUTES = int(
+    os.getenv("DECRYPT_LOCK_MINUTES", 5)
+)
