@@ -87,6 +87,15 @@ def verify_signup_otp(request: Request, email: str, otp: str):
         if failed_otps >= 3:
             lock_account(email, "otp", 5)
 
+            try:
+                send_email(
+                    email,
+                    "SecureVault OTP Locked",
+                    "Too many wrong OTP attempts were detected. OTP verification is temporarily locked."
+                )
+            except:
+                pass
+
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
 
     reset_failed_attempts(email, "wrong_otp")
@@ -132,8 +141,27 @@ def login(request: Request, data: LoginRequest):
 
         failed_logins = get_failed_attempts(data.email, "failed_login", 30)
 
+        if failed_logins >= 3:
+            try:
+                send_email(
+                    data.email,
+                    "SecureVault Security Alert",
+                    "Multiple failed login attempts were detected on your account."
+                )
+            except:
+                pass
+
         if failed_logins >= 5:
             lock_account(data.email, "login", 10)
+
+            try:
+                send_email(
+                    data.email,
+                    "SecureVault Account Locked",
+                    "Too many failed login attempts were detected. Login is temporarily locked."
+                )
+            except:
+                pass
 
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
@@ -175,6 +203,15 @@ def login_otp(request: Request, email: str, otp: str):
         if failed_otps >= 3:
             lock_account(email, "otp", 5)
 
+            try:
+                send_email(
+                    email,
+                    "SecureVault OTP Locked",
+                    "Too many wrong OTP attempts were detected. OTP verification is temporarily locked."
+                )
+            except:
+                pass
+
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
 
     token = create_jwt(email)
@@ -195,6 +232,15 @@ def login_otp(request: Request, email: str, otp: str):
         ip_address=request.client.host,
         user_agent=request.headers.get("user-agent", "")
     )
+
+    try:
+        send_email(
+            email,
+            "SecureVault New Login",
+            f"New login detected from IP: {request.client.host}"
+        )
+    except:
+        pass
 
     return {"access_token": token}
 
@@ -246,6 +292,15 @@ def reset_password_confirm(
 
         if failed_otps >= 3:
             lock_account(email, "otp", 5)
+
+            try:
+                send_email(
+                    email,
+                    "SecureVault OTP Locked",
+                    "Too many wrong OTP attempts were detected. OTP verification is temporarily locked."
+                )
+            except:
+                pass
 
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
 
