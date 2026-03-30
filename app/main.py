@@ -16,7 +16,7 @@ from app.vault.vault_routes import vault_router
 from app.vault.vault_models import create_vault_tables
 from app.security.security_models import create_security_tables
 from app.security.rate_limit import limiter
-from app.config import KYBER_SERVICE_URL
+from app.config import KYBER_SERVICE_URL, FRONTEND_URL
 
 # -------------------------------------------------
 # APP INIT
@@ -36,7 +36,7 @@ app.add_middleware(SlowAPIMiddleware)
 # -------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],          # safe because auth is JWT-based
+    allow_origins=[FRONTEND_URL],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
