@@ -83,6 +83,29 @@ def get_user_risk_score(email: str) -> int:
 
 
 # =========================================================
+# MULTIPLE IP DETECTION
+# =========================================================
+
+def check_multiple_ips(email: str, hours: int = 1) -> bool:
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT COUNT(DISTINCT ip_address)
+    FROM login_history
+    WHERE email = ?
+    AND created_at >= datetime('now', ?)
+    """, (
+        email,
+        f'-{hours} hours'
+    ))
+
+    ip_count = cur.fetchone()[0]
+    cur.close()
+
+    return ip_count >= 3
+
+
+# =========================================================
 # ACCOUNT LOCK HELPERS
 # =========================================================
 
