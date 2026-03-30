@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,7 +16,7 @@ from app.vault.vault_routes import vault_router
 from app.vault.vault_models import create_vault_tables
 from app.security.security_models import create_security_tables
 from app.security.security_routes import security_router
-from app.security.rate_limit import limiter
+from app.security.rate_limit import limiter, HEALTH_LIMIT
 from app.config import KYBER_SERVICE_URL, FRONTEND_URL
 
 # -------------------------------------------------
@@ -99,7 +99,8 @@ def pqc_metrics():
 # HEALTH CHECK (RENDER USES THIS)
 # -------------------------------------------------
 @app.get("/health", tags=["System"])
-def health():
+@limiter.limit(HEALTH_LIMIT)
+def health(request: Request):
     return {
         "status": "SecureVault Backend Running",
         "environment": os.getenv("RENDER", "local"),
