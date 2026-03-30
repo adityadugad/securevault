@@ -36,7 +36,16 @@ async function signup() {
     const data = await res.json();
 
     if (!res.ok) {
-      setMsg("msg", data.detail || "Signup failed", "err");
+      const detail = data.detail || "Signup failed";
+
+      if (detail.includes("locked")) {
+        setMsg("msg", "🔒 " + detail, "err");
+      } else if (detail.includes("Too many")) {
+        setMsg("msg", "⚠️ " + detail, "err");
+      } else {
+        setMsg("msg", detail, "err");
+      }
+
       return;
     }
 
@@ -71,7 +80,16 @@ async function login() {
     const data = await res.json();
 
     if (!res.ok) {
-      setMsg("msg", data.detail || "Login failed", "err");
+      const detail = data.detail || "Login failed";
+
+      if (detail.includes("locked")) {
+        setMsg("msg", "🔒 " + detail, "err");
+      } else if (detail.includes("Too many")) {
+        setMsg("msg", "⚠️ " + detail, "err");
+      } else {
+        setMsg("msg", detail, "err");
+      }
+
       return;
     }
 
@@ -109,7 +127,16 @@ async function verifyOtp() {
       const data = await res.json();
 
       if (!res.ok) {
-        setMsg("msg", data.detail || "Invalid OTP", "err");
+        const detail = data.detail || "Invalid OTP";
+
+        if (detail.includes("locked")) {
+          setMsg("msg", "🔒 " + detail, "err");
+        } else if (detail.includes("Too many")) {
+          setMsg("msg", "⚠️ " + detail, "err");
+        } else {
+          setMsg("msg", detail, "err");
+        }
+
         return;
       }
 
@@ -135,7 +162,16 @@ async function verifyOtp() {
       const data = await res.json();
 
       if (!res.ok) {
-        setMsg("msg", data.detail || "Invalid OTP", "err");
+        const detail = data.detail || "Invalid OTP";
+
+        if (detail.includes("locked")) {
+          setMsg("msg", "🔒 " + detail, "err");
+        } else if (detail.includes("Too many")) {
+          setMsg("msg", "⚠️ " + detail, "err");
+        } else {
+          setMsg("msg", detail, "err");
+        }
+
         return;
       }
 
