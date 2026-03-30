@@ -9,10 +9,10 @@ import os
 # ENV-SAFE CONFIG (RENDER + LOCAL)
 # ======================================================
 
-JWT_SECRET = os.environ.get(
-    "JWT_SECRET",
-    "securevault-dev-jwt-secret-change-this"
-)
+JWT_SECRET = os.environ.get("JWT_SECRET")
+
+if not JWT_SECRET:
+    raise RuntimeError("JWT_SECRET environment variable is required")
 
 JWT_EXP_MINUTES = int(
     os.environ.get("JWT_EXP_MINUTES", 60)
