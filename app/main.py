@@ -15,6 +15,7 @@ from app.pqc.metrics import get_pqc_metrics
 from app.vault.vault_routes import vault_router
 from app.vault.vault_models import create_vault_tables
 from app.security.security_models import create_security_tables
+from app.security.security_routes import security_router
 from app.security.rate_limit import limiter
 from app.config import KYBER_SERVICE_URL, FRONTEND_URL
 
@@ -60,6 +61,7 @@ create_security_tables()
 # -------------------------------------------------
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(vault_router, prefix="/vault", tags=["Vault"])
+app.include_router(security_router, prefix="/security", tags=["Security"])
 
 # -------------------------------------------------
 # STATIC FRONTEND (HTML / CSS / JS)
