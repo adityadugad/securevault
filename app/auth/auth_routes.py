@@ -1,3 +1,4 @@
+```python
 from fastapi import APIRouter, HTTPException, status, Depends, Request
 from app.database import conn
 from app.schemas import SignupRequest, LoginRequest, TokenResponse
@@ -20,6 +21,7 @@ from app.security.security_utils import (
     lock_account,
     is_account_locked,
     reset_failed_attempts,
+    check_multiple_ips,
 )
 
 from app.security.session_utils import (
@@ -233,6 +235,24 @@ def login_otp(request: Request, email: str, otp: str):
         user_agent=request.headers.get("user-agent", "")
     )
 
+    if check_multiple_ips(email):
+        log_security_event(
+            email=email,
+            ip_address=request.client.host,
+            endpoint="/auth/login-otp",
+            event_type="multiple_ips",
+            status="warning"
+        )
+
+        try:
+            send_email(
+                email,
+                "SecureVault Security Warning",
+                "Your account was accessed from multiple IP addresses recently."
+            )
+        except:
+            pass
+
     try:
         send_email(
             email,
@@ -330,3 +350,4 @@ def read_current_user(current_user: str = Depends(get_current_user)):
         "email": current_user,
         "message": "JWT authentication successful"
     }
+```
