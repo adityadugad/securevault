@@ -9,7 +9,17 @@ async function loadTodos() {
     headers: { Authorization: `Bearer ${token}` }
   });
 
-  if (!res.ok) return;
+  if (!res.ok) {
+    const data = await res.json();
+
+    if (data.detail) {
+      alert(data.detail);
+    } else {
+      alert("Failed to load todos");
+    }
+
+    return;
+  }
 
   const data = await res.json();
   const list = document.getElementById("todosList");
