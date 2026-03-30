@@ -1,48 +1,75 @@
 # ================================
+
 # Core Framework & Server
+
 # ================================
+
 fastapi
 starlette
 uvicorn[standard]
 gunicorn
 
 # ================================
+
 # Authentication & Security
+
 # ================================
+
 python-jose[cryptography]
 argon2-cffi
 passlib[bcrypt]
+slowapi
+user-agents
+pydantic-settings
 
 # ================================
+
 # Cryptography (Vault Encryption)
+
 # ================================
+
 cryptography
 
 # ================================
+
 # Forms, Uploads, Validation
+
 # ================================
+
 python-multipart
 email-validator
 pydantic[email]
 
 # ================================
+
 # Environment Variables
+
 # ================================
+
 python-dotenv
 
 # ================================
+
 # Database (SQLite on Render/Linux)
+
 # ================================
+
 sqlite-utils
 
 # ================================
+
 # HTTP & Utilities
+
 # ================================
+
 requests
 
 # ================================
+
 # Machine Learning (SVM Inference)
+
 # ================================
+
 scikit-learn
 joblib
 numpy
