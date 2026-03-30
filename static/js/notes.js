@@ -17,6 +17,18 @@ async function loadNotes() {
     }
   });
 
+  if (!res.ok) {
+    const data = await res.json();
+
+    if (data.detail) {
+      alert(data.detail);
+    } else {
+      alert("Failed to load notes");
+    }
+
+    return;
+  }
+
   const data = await res.json();
   const list = document.getElementById("notesList");
   list.innerHTML = "";
