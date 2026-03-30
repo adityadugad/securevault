@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Body, HTTPException
+from fastapi import APIRouter, Depends, Body, HTTPException, Request
 from app.auth.auth_utils import get_current_user
 from app.vault.vault_utils import encrypt_text, decrypt_text
 from app.database import conn
@@ -8,6 +8,20 @@ from app.ml.password_strength_model import predict_strength
 from app.auth.otp_utils import generate_otp, store_otp, verify_otp
 from app.auth.email_utils import send_email
 
+from app.security.rate_limit import (
+    limiter,
+    DECRYPT_LIMIT,
+    ADMIN_LIMIT,
+    PASSWORD_STRENGTH_LIMIT,
+)
+
+from app.security.security_utils import (
+    log_security_event,
+    get_failed_attempts,
+    lock_account,
+    is_account_locked,
+)
+
 import os
 import base64
 
@@ -16,9 +30,9 @@ vault_router = APIRouter(tags=["Vault"])
 
 # ================= ADMIN CONFIG =================
 
-ADMIN_ID = "admin"
-ADMIN_PASS = "secure123"
-ADMIN_EMAIL = "adityadugad@gmail.com"
+ADMIN_ID = os.getenv("ADMIN_ID")
+ADMIN_PASS = os.getenv("ADMIN_PASS")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 
 
 # =========================================================
@@ -64,7 +78,35 @@ def list_notes(user=Depends(get_current_user)):
 
 
 @vault_router.get("/notes/decrypted")
-def list_notes_decrypted(user=Depends(get_current_user)):
+@limiter.limit(DECRYPT_LIMIT)
+def list_notes_decrypted(
+    request: Request,
+    user=Depends(get_current_user)
+):
+    if is_account_locked(user, "decrypt"):
+        raise HTTPException(
+            status_code=403,
+            detail="Too many decrypt requests. Try again later."
+        )
+
+    decrypt_attempts = get_failed_attempts(user, "decrypt_abuse", 10)
+
+    if decrypt_attempts >= 10:
+        lock_account(user, "decrypt", 5)
+
+        raise HTTPException(
+            status_code=403,
+            detail="Too many decrypt requests. Temporarily locked."
+        )
+
+    log_security_event(
+        email=user,
+        ip_address=request.client.host,
+        endpoint="/vault/notes/decrypted",
+        event_type="decrypt_abuse",
+        status="info"
+    )
+
     cur = conn.cursor()
     cur.execute(
         """
@@ -150,7 +192,35 @@ def list_todos(user=Depends(get_current_user)):
 
 
 @vault_router.get("/todos/decrypted")
-def list_todos_decrypted(user=Depends(get_current_user)):
+@limiter.limit(DECRYPT_LIMIT)
+def list_todos_decrypted(
+    request: Request,
+    user=Depends(get_current_user)
+):
+    if is_account_locked(user, "decrypt"):
+        raise HTTPException(
+            status_code=403,
+            detail="Too many decrypt requests. Try again later."
+        )
+
+    decrypt_attempts = get_failed_attempts(user, "decrypt_abuse", 10)
+
+    if decrypt_attempts >= 10:
+        lock_account(user, "decrypt", 5)
+
+        raise HTTPException(
+            status_code=403,
+            detail="Too many decrypt requests. Temporarily locked."
+        )
+
+    log_security_event(
+        email=user,
+        ip_address=request.client.host,
+        endpoint="/vault/todos/decrypted",
+        event_type="decrypt_abuse",
+        status="info"
+    )
+
     cur = conn.cursor()
     cur.execute(
         """
@@ -254,7 +324,35 @@ def list_passwords(user=Depends(get_current_user)):
 
 
 @vault_router.get("/passwords/decrypted")
-def list_passwords_decrypted(user=Depends(get_current_user)):
+@limiter.limit(DECRYPT_LIMIT)
+def list_passwords_decrypted(
+    request: Request,
+    user=Depends(get_current_user)
+):
+    if is_account_locked(user, "decrypt"):
+        raise HTTPException(
+            status_code=403,
+            detail="Too many decrypt requests. Try again later."
+        )
+
+    decrypt_attempts = get_failed_attempts(user, "decrypt_abuse", 10)
+
+    if decrypt_attempts >= 10:
+        lock_account(user, "decrypt", 5)
+
+        raise HTTPException(
+            status_code=403,
+            detail="Too many decrypt requests. Temporarily locked."
+        )
+
+    log_security_event(
+        email=user,
+        ip_address=request.client.host,
+        endpoint="/vault/passwords/decrypted",
+        event_type="decrypt_abuse",
+        status="info"
+    )
+
     cur = conn.cursor()
     cur.execute(
         """
@@ -304,7 +402,9 @@ def delete_password(password_id: int, user=Depends(get_current_user)):
 # =========================================================
 
 @vault_router.post("/password-strength")
+@limiter.limit(PASSWORD_STRENGTH_LIMIT)
 def password_strength_check(
+    request: Request,
     data: dict = Body(...),
     user=Depends(get_current_user),
 ):
@@ -318,9 +418,32 @@ def password_strength_check(
 # =========================================================
 
 @vault_router.post("/admin/request-otp")
-def admin_request_otp(data: dict):
+@limiter.limit(ADMIN_LIMIT)
+def admin_request_otp(request: Request, data: dict):
+    if is_account_locked(ADMIN_EMAIL, "admin"):
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access temporarily locked."
+        )
 
     if data.get("id") != ADMIN_ID or data.get("pass") != ADMIN_PASS:
+        log_security_event(
+            email=ADMIN_EMAIL,
+            ip_address=request.client.host,
+            endpoint="/vault/admin/request-otp",
+            event_type="admin_failure",
+            status="failed"
+        )
+
+        admin_failures = get_failed_attempts(
+            ADMIN_EMAIL,
+            "admin_failure",
+            60
+        )
+
+        if admin_failures >= 2:
+            lock_account(ADMIN_EMAIL, "admin", 15)
+
         raise HTTPException(status_code=403, detail="Invalid admin")
 
     otp = generate_otp()
@@ -345,11 +468,19 @@ def fake_kem():
 
 
 @vault_router.post("/admin/encrypted-db")
-def admin_encrypted_db(data: dict):
-
+@limiter.limit(ADMIN_LIMIT)
+def admin_encrypted_db(request: Request, data: dict):
     otp = str(data.get("otp", "")).strip()
 
     if not verify_otp(ADMIN_EMAIL.strip(), otp):
+        log_security_event(
+            email=ADMIN_EMAIL,
+            ip_address=request.client.host,
+            endpoint="/vault/admin/encrypted-db",
+            event_type="admin_failure",
+            status="failed"
+        )
+
         raise HTTPException(status_code=403, detail="Invalid OTP")
 
     cur = conn.cursor()
