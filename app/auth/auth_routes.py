@@ -1,4 +1,4 @@
-```python
+
 from fastapi import APIRouter, HTTPException, status, Depends, Request
 from app.database import conn
 from app.schemas import SignupRequest, LoginRequest, TokenResponse
@@ -350,4 +350,4 @@ def read_current_user(current_user: str = Depends(get_current_user)):
         "email": current_user,
         "message": "JWT authentication successful"
     }
-```
+
