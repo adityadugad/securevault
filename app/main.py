@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.extension import _rate_limit_exceeded_handler
 import os
 import threading
 import requests
@@ -12,6 +15,7 @@ from app.pqc.metrics import get_pqc_metrics
 from app.vault.vault_routes import vault_router
 from app.vault.vault_models import create_vault_tables
 from app.security.security_models import create_security_tables
+from app.security.rate_limit import limiter
 from app.config import KYBER_SERVICE_URL
 
 # -------------------------------------------------
@@ -22,6 +26,10 @@ app = FastAPI(
     docs_url="/docs",        # enable Swagger on Render
     redoc_url="/redoc"
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 # -------------------------------------------------
 # CORS (RENDER + LOCAL SAFE)
