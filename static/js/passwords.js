@@ -15,7 +15,17 @@ async function loadPasswords() {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    if (!res.ok) return;
+    if (!res.ok) {
+      const data = await res.json();
+
+      if (data.detail) {
+        alert(data.detail);
+      } else {
+        alert("Failed to load passwords");
+      }
+
+      return;
+    }
 
     const data = await res.json();
 
@@ -38,6 +48,7 @@ async function loadPasswords() {
 
   } catch (err) {
     console.error("Failed to load passwords", err);
+    alert("Failed to load passwords");
   }
 }
 
