@@ -1,4 +1,4 @@
-
+```python
 from fastapi import APIRouter, HTTPException, status, Depends, Request
 from app.database import conn
 from app.schemas import SignupRequest, LoginRequest, TokenResponse
@@ -33,26 +33,41 @@ from app.security.password_check_utils import get_password_warning
 
 auth_router = APIRouter(tags=["Authentication"])
 
-# ---------- SIGNUP (SEND OTP) ----------
+
+# =========================================================
+# SIGNUP (SEND OTP)
+# =========================================================
+
 @auth_router.post("/signup")
 @limiter.limit(SIGNUP_LIMIT)
 def signup(request: Request, data: SignupRequest):
     password_warning = get_password_warning(data.password)
 
     if password_warning:
-        raise HTTPException(status_code=400, detail=password_warning)
+        raise HTTPException(
+            status_code=400,
+            detail=password_warning
+        )
 
     cur = conn.cursor()
     hashed = hash_password(data.password)
 
     try:
         cur.execute(
-            "INSERT INTO users (email, password_hash, is_verified) VALUES (?, ?, 0)",
+            """
+            INSERT INTO users
+            (email, password_hash, is_verified)
+            VALUES (?, ?, 0)
+            """,
             (data.email, hashed)
         )
         conn.commit()
+
     except:
-        raise HTTPException(status_code=400, detail="User already exists")
+        raise HTTPException(
+            status_code=400,
+            detail="User already exists"
+        )
 
     otp = generate_otp()
     store_otp(data.email, otp)
@@ -63,9 +78,15 @@ def signup(request: Request, data: SignupRequest):
         f"Your OTP is {otp}. It expires in 5 minutes."
     )
 
-    return {"message": "OTP sent to email for verification"}
+    return {
+        "message": "OTP sent to email for verification"
+    }
 
-# ---------- VERIFY SIGNUP OTP ----------
+
+# =========================================================
+# VERIFY SIGNUP OTP
+# =========================================================
+
 @auth_router.post("/verify-signup-otp")
 @limiter.limit(OTP_LIMIT)
 def verify_signup_otp(request: Request, email: str, otp: str):
@@ -84,7 +105,11 @@ def verify_signup_otp(request: Request, email: str, otp: str):
             status="failed"
         )
 
-        failed_otps = get_failed_attempts(email, "wrong_otp", 30)
+        failed_otps = get_failed_attempts(
+            email,
+            "wrong_otp",
+            30
+        )
 
         if failed_otps >= 3:
             lock_account(email, "otp", 5)
@@ -98,34 +123,67 @@ def verify_signup_otp(request: Request, email: str, otp: str):
             except:
                 pass
 
-        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid or expired OTP"
+        )
 
     reset_failed_attempts(email, "wrong_otp")
 
     cur = conn.cursor()
-    cur.execute("UPDATE users SET is_verified = 1 WHERE email = ?", (email,))
+    cur.execute(
+        """
+        UPDATE users
+        SET is_verified = 1
+        WHERE email = ?
+        """,
+        (email,)
+    )
     conn.commit()
 
-    return {"message": "Account verified successfully"}
+    return {
+        "message": "Account verified successfully"
+    }
 
-# ---------- LOGIN (SEND 2FA OTP) ----------
+
+# =========================================================
+# LOGIN (SEND 2FA OTP)
+# =========================================================
+
 @auth_router.post("/login")
 @limiter.limit(LOGIN_LIMIT)
 def login(request: Request, data: LoginRequest):
+    # First check if already locked
     if is_account_locked(data.email, "login"):
         raise HTTPException(
             status_code=403,
-            detail="Too many failed logins. Account locked for 10 minutes."
+            detail="Account locked for 10 minutes due to multiple failed login attempts"
         )
 
     cur = conn.cursor()
     cur.execute(
-        "SELECT password_hash, is_verified FROM users WHERE email = ?",
+        """
+        SELECT password_hash, is_verified
+        FROM users
+        WHERE email = ?
+        """,
         (data.email,)
     )
     user = cur.fetchone()
 
-    if not user or not verify_password(user[0], data.password):
+    # -------------------------------------------------
+    # USER DOES NOT EXIST
+    # -------------------------------------------------
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User does not exist"
+        )
+
+    # -------------------------------------------------
+    # WRONG PASSWORD
+    # -------------------------------------------------
+    if not verify_password(user[0], data.password):
         log_security_event(
             email=data.email,
             ip_address=request.client.host,
@@ -141,8 +199,13 @@ def login(request: Request, data: LoginRequest):
             success=False
         )
 
-        failed_logins = get_failed_attempts(data.email, "failed_login", 30)
+        failed_logins = get_failed_attempts(
+            data.email,
+            "failed_login",
+            30
+        )
 
+        # Warning mail after 3 failed attempts
         if failed_logins >= 3:
             try:
                 send_email(
@@ -153,23 +216,48 @@ def login(request: Request, data: LoginRequest):
             except:
                 pass
 
+        # Lock after 5 failed attempts
         if failed_logins >= 5:
             lock_account(data.email, "login", 10)
+
+            # IMPORTANT FIX:
+            # reset attempts after lock to prevent infinite re-lock
+            reset_failed_attempts(
+                data.email,
+                "failed_login"
+            )
 
             try:
                 send_email(
                     data.email,
                     "SecureVault Account Locked",
-                    "Too many failed login attempts were detected. Login is temporarily locked."
+                    "Too many failed login attempts were detected. Your account is locked for 10 minutes."
                 )
             except:
                 pass
 
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+            raise HTTPException(
+                status_code=403,
+                detail="Account locked for 10 minutes due to multiple failed login attempts"
+            )
 
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect password"
+        )
+
+    # -------------------------------------------------
+    # EMAIL NOT VERIFIED
+    # -------------------------------------------------
     if not user[1]:
-        raise HTTPException(status_code=403, detail="Email not verified")
+        raise HTTPException(
+            status_code=403,
+            detail="Email not verified"
+        )
 
+    # -------------------------------------------------
+    # SUCCESS → SEND LOGIN OTP
+    # -------------------------------------------------
     otp = generate_otp()
     store_otp(data.email, otp)
 
@@ -179,9 +267,15 @@ def login(request: Request, data: LoginRequest):
         f"Your login OTP is {otp}. It expires in 5 minutes."
     )
 
-    return {"message": "2FA OTP sent to email"}
+    return {
+        "message": "2FA OTP sent to email"
+    }
 
-# ---------- VERIFY LOGIN OTP (ISSUE JWT) ----------
+
+# =========================================================
+# VERIFY LOGIN OTP (ISSUE JWT)
+# =========================================================
+
 @auth_router.post("/login-otp", response_model=TokenResponse)
 @limiter.limit(OTP_LIMIT)
 def login_otp(request: Request, email: str, otp: str):
@@ -200,7 +294,11 @@ def login_otp(request: Request, email: str, otp: str):
             status="failed"
         )
 
-        failed_otps = get_failed_attempts(email, "wrong_otp", 30)
+        failed_otps = get_failed_attempts(
+            email,
+            "wrong_otp",
+            30
+        )
 
         if failed_otps >= 3:
             lock_account(email, "otp", 5)
@@ -214,7 +312,10 @@ def login_otp(request: Request, email: str, otp: str):
             except:
                 pass
 
-        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid or expired OTP"
+        )
 
     token = create_jwt(email)
 
@@ -262,9 +363,15 @@ def login_otp(request: Request, email: str, otp: str):
     except:
         pass
 
-    return {"access_token": token}
+    return {
+        "access_token": token
+    }
 
-# ---------- PASSWORD RESET (SEND OTP) ----------
+
+# =========================================================
+# PASSWORD RESET (SEND OTP)
+# =========================================================
+
 @auth_router.post("/reset-password")
 @limiter.limit(RESET_PASSWORD_LIMIT)
 def reset_password(request: Request, email: str):
@@ -277,9 +384,15 @@ def reset_password(request: Request, email: str):
         f"Your password reset OTP is {otp}. It expires in 5 minutes."
     )
 
-    return {"message": "Password reset OTP sent"}
+    return {
+        "message": "Password reset OTP sent"
+    }
 
-# ---------- CONFIRM PASSWORD RESET ----------
+
+# =========================================================
+# CONFIRM PASSWORD RESET
+# =========================================================
+
 @auth_router.post("/reset-password-confirm")
 @limiter.limit(OTP_LIMIT)
 def reset_password_confirm(
@@ -291,7 +404,10 @@ def reset_password_confirm(
     password_warning = get_password_warning(new_password)
 
     if password_warning:
-        raise HTTPException(status_code=400, detail=password_warning)
+        raise HTTPException(
+            status_code=400,
+            detail=password_warning
+        )
 
     if is_account_locked(email, "otp"):
         raise HTTPException(
@@ -308,7 +424,11 @@ def reset_password_confirm(
             status="failed"
         )
 
-        failed_otps = get_failed_attempts(email, "wrong_otp", 30)
+        failed_otps = get_failed_attempts(
+            email,
+            "wrong_otp",
+            30
+        )
 
         if failed_otps >= 3:
             lock_account(email, "otp", 5)
@@ -322,13 +442,20 @@ def reset_password_confirm(
             except:
                 pass
 
-        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid or expired OTP"
+        )
 
     hashed = hash_password(new_password)
 
     cur = conn.cursor()
     cur.execute(
-        "UPDATE users SET password_hash = ? WHERE email = ?",
+        """
+        UPDATE users
+        SET password_hash = ?
+        WHERE email = ?
+        """,
         (hashed, email)
     )
     conn.commit()
@@ -341,13 +468,21 @@ def reset_password_confirm(
         "Your password was changed successfully. If this was not you, please secure your account immediately."
     )
 
-    return {"message": "Password updated successfully"}
+    return {
+        "message": "Password updated successfully"
+    }
 
-# ---------- PROTECTED TEST ----------
+
+# =========================================================
+# PROTECTED TEST
+# =========================================================
+
 @auth_router.get("/me")
-def read_current_user(current_user: str = Depends(get_current_user)):
+def read_current_user(
+    current_user: str = Depends(get_current_user)
+):
     return {
         "email": current_user,
         "message": "JWT authentication successful"
     }
-
+```
