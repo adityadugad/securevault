@@ -4,6 +4,7 @@
 // Fixes:
 // - Account lock popup
 // - Wrong password popup
+// - Remaining attempts display (2/3, 1/3)
 // - Network error false alerts
 // - Buttons freezing after account lock
 // - Stale localStorage cleanup
@@ -30,8 +31,6 @@ function setMsg(id, text, type = "") {
 
 // ======================================================
 // CLEAR TEMP AUTH STATE
-// VERY IMPORTANT FIX
-// Prevents button freeze after failed login/signup
 // ======================================================
 
 function clearTempAuthState() {
@@ -43,7 +42,6 @@ function clearTempAuthState() {
 
 // ======================================================
 // SAFE JSON PARSER
-// Prevents false "Network error"
 // ======================================================
 
 async function safeJson(
@@ -196,8 +194,6 @@ async function login() {
     );
 
     if (!res.ok) {
-      // CRITICAL FIX
-      // prevents stuck buttons after lock
       clearTempAuthState();
 
       const detail =
@@ -231,14 +227,15 @@ async function login() {
       }
 
       // -----------------------------
-      // WRONG PASSWORD
+      // WRONG PASSWORD + REMAINING ATTEMPTS
+      // IMPORTANT FIX
       // -----------------------------
       else if (
         detail.includes("Incorrect password")
       ) {
         setMsg(
           "msg",
-          "❌ Incorrect password",
+          "❌ " + detail,
           "err"
         );
       }
@@ -295,8 +292,9 @@ async function login() {
 
     window.location.href =
       "/static/otp.html";
+  }
 
-  } catch (e) {
+  catch (e) {
     clearTempAuthState();
 
     setMsg(
@@ -333,7 +331,6 @@ async function verifyOtp() {
       "msg",
       "Verifying OTP..."
     );
-
 
     // ==================================================
     // SIGNUP OTP
@@ -404,7 +401,6 @@ async function verifyOtp() {
 
       return;
     }
-
 
     // ==================================================
     // LOGIN OTP
