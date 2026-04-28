@@ -23,10 +23,9 @@ KYBER_SERVICE_URL = os.getenv("KYBER_SERVICE_URL", "")
 # ADMIN CONFIG
 # ======================================================
 
-ADMIN_ID = os.getenv("ADMIN_ID")
-ADMIN_PASS = os.getenv("ADMIN_PASS")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
-
+ADMIN_ID = "admin"
+ADMIN_PASS = "secure123"
+ADMIN_EMAIL = "adityadugad@gmail.com"
 # ======================================================
 # FRONTEND / CORS
 # ======================================================
