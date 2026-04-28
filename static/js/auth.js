@@ -1,5 +1,6 @@
+```javascript
 // ======================================================
-// SecureVault Authentication Logic (UPDATED & STABLE)
+// SecureVault Authentication Logic (FINAL FIXED VERSION)
 // Full Replaceable Code
 // ======================================================
 
@@ -18,6 +19,23 @@ function setMsg(id, text, type = "") {
 
   el.innerText = text;
   el.className = "msg " + type;
+}
+
+
+// ======================================================
+// SAFE JSON PARSER
+// Prevents "Network error" issue when backend returns
+// non-JSON / server error / FastAPI exception page
+// ======================================================
+
+async function safeJson(res, fallbackMessage = "Server error") {
+  try {
+    return await res.json();
+  } catch (e) {
+    return {
+      detail: fallbackMessage
+    };
+  }
 }
 
 
@@ -48,7 +66,10 @@ async function signup() {
       })
     });
 
-    const data = await res.json();
+    const data = await safeJson(
+      res,
+      "Signup failed. Please try again."
+    );
 
     if (!res.ok) {
       const detail = data.detail || "Signup failed";
@@ -72,7 +93,11 @@ async function signup() {
     window.location.href = "/static/otp.html";
 
   } catch (e) {
-    setMsg("msg", "Network error", "err");
+    setMsg(
+      "msg",
+      "Unable to connect to server",
+      "err"
+    );
   }
 }
 
@@ -104,7 +129,12 @@ async function login() {
       })
     });
 
-    const data = await res.json();
+    // IMPORTANT FIX:
+    // prevents false "Network error"
+    const data = await safeJson(
+      res,
+      "Login failed. Please try again."
+    );
 
     if (!res.ok) {
       const detail = data.detail || "Login failed";
@@ -112,21 +142,26 @@ async function login() {
       // -----------------------------
       // ACCOUNT LOCKED
       // -----------------------------
-      if (detail.includes("locked")) {
+      if (
+        detail.includes("locked") ||
+        detail.includes("Account locked")
+      ) {
         setMsg(
           "msg",
-          "🔒 " + detail,
+          "🔒 Account locked for 10 minutes",
           "err"
         );
       }
 
       // -----------------------------
-      // TOO MANY REQUESTS / RATE LIMIT
+      // RATE LIMIT / TOO MANY REQUESTS
       // -----------------------------
-      else if (detail.includes("Too many")) {
+      else if (
+        detail.includes("Too many")
+      ) {
         setMsg(
           "msg",
-          "⚠️ " + detail,
+          "⚠️ Too many attempts. Please wait and try again.",
           "err"
         );
       }
@@ -134,7 +169,9 @@ async function login() {
       // -----------------------------
       // WRONG PASSWORD
       // -----------------------------
-      else if (detail.includes("Incorrect password")) {
+      else if (
+        detail.includes("Incorrect password")
+      ) {
         setMsg(
           "msg",
           "❌ Incorrect password",
@@ -145,7 +182,9 @@ async function login() {
       // -----------------------------
       // USER NOT FOUND
       // -----------------------------
-      else if (detail.includes("User does not exist")) {
+      else if (
+        detail.includes("User does not exist")
+      ) {
         setMsg(
           "msg",
           "❌ User does not exist",
@@ -156,16 +195,18 @@ async function login() {
       // -----------------------------
       // EMAIL NOT VERIFIED
       // -----------------------------
-      else if (detail.includes("Email not verified")) {
+      else if (
+        detail.includes("Email not verified")
+      ) {
         setMsg(
           "msg",
-          "⚠️ Email not verified. Please complete signup verification.",
+          "⚠️ Email not verified. Please verify your account first.",
           "err"
         );
       }
 
       // -----------------------------
-      // DEFAULT ERROR
+      // DEFAULT
       // -----------------------------
       else {
         setMsg(
@@ -184,7 +225,11 @@ async function login() {
     window.location.href = "/static/otp.html";
 
   } catch (e) {
-    setMsg("msg", "Network error", "err");
+    setMsg(
+      "msg",
+      "Unable to connect to server",
+      "err"
+    );
   }
 }
 
@@ -199,7 +244,11 @@ async function verifyOtp() {
     const mode = localStorage.getItem("otp_mode");
 
     if (!otp || !mode) {
-      setMsg("msg", "OTP session expired", "err");
+      setMsg(
+        "msg",
+        "OTP session expired",
+        "err"
+      );
       return;
     }
 
@@ -220,7 +269,10 @@ async function verifyOtp() {
         }
       );
 
-      const data = await res.json();
+      const data = await safeJson(
+        res,
+        "Invalid OTP"
+      );
 
       if (!res.ok) {
         const detail = data.detail || "Invalid OTP";
@@ -269,7 +321,10 @@ async function verifyOtp() {
         }
       );
 
-      const data = await res.json();
+      const data = await safeJson(
+        res,
+        "Invalid OTP"
+      );
 
       if (!res.ok) {
         const detail = data.detail || "Invalid OTP";
@@ -295,11 +350,16 @@ async function verifyOtp() {
       localStorage.removeItem("otp_mode");
       localStorage.removeItem("login_email");
 
-      window.location.href = "/static/dashboard.html";
+      window.location.href =
+        "/static/dashboard.html";
     }
 
   } catch (e) {
-    setMsg("msg", "Network error", "err");
+    setMsg(
+      "msg",
+      "Unable to connect to server",
+      "err"
+    );
   }
 }
 
@@ -327,7 +387,8 @@ function logout() {
 // ======================================================
 
 function goSignup() {
-  window.location.href = "/static/signup.html";
+  window.location.href =
+    "/static/signup.html";
 }
 
 function goLogin() {
@@ -341,20 +402,25 @@ function goLogin() {
 
 function goNotes() {
   requireAuth();
-  window.location.href = "/static/notes.html";
+  window.location.href =
+    "/static/notes.html";
 }
 
 function goTodos() {
   requireAuth();
-  window.location.href = "/static/todos.html";
+  window.location.href =
+    "/static/todos.html";
 }
 
 function goPasswords() {
   requireAuth();
-  window.location.href = "/static/passwords.html";
+  window.location.href =
+    "/static/passwords.html";
 }
 
 function goPqc() {
   requireAuth();
-  window.location.href = "/static/pqc.html";
+  window.location.href =
+    "/static/pqc.html";
 }
+```
