@@ -1,8 +1,13 @@
 // ======================================================
-// SecureVault Authentication Logic (FINAL & STABLE)
+// SecureVault Authentication Logic (UPDATED & STABLE)
+// Full Replaceable Code
 // ======================================================
 
-// ---------------- UTIL ----------------
+
+// ======================================================
+// UTIL
+// ======================================================
+
 function qs(id) {
   return document.getElementById(id);
 }
@@ -10,11 +15,16 @@ function qs(id) {
 function setMsg(id, text, type = "") {
   const el = document.getElementById(id);
   if (!el) return;
+
   el.innerText = text;
   el.className = "msg " + type;
 }
 
-// ---------------- SIGNUP ----------------
+
+// ======================================================
+// SIGNUP
+// ======================================================
+
 async function signup() {
   try {
     const email = qs("email")?.value?.trim();
@@ -29,8 +39,13 @@ async function signup() {
 
     const res = await fetch("/auth/signup", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
     });
 
     const data = await res.json();
@@ -40,9 +55,11 @@ async function signup() {
 
       if (detail.includes("locked")) {
         setMsg("msg", "🔒 " + detail, "err");
-      } else if (detail.includes("Too many")) {
+      }
+      else if (detail.includes("Too many")) {
         setMsg("msg", "⚠️ " + detail, "err");
-      } else {
+      }
+      else {
         setMsg("msg", detail, "err");
       }
 
@@ -53,12 +70,17 @@ async function signup() {
     localStorage.setItem("signup_email", email);
 
     window.location.href = "/static/otp.html";
+
   } catch (e) {
     setMsg("msg", "Network error", "err");
   }
 }
 
-// ---------------- LOGIN (PASSWORD) ----------------
+
+// ======================================================
+// LOGIN (PASSWORD)
+// ======================================================
+
 async function login() {
   try {
     const email = qs("email")?.value?.trim();
@@ -73,8 +95,13 @@ async function login() {
 
     const res = await fetch("/auth/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
     });
 
     const data = await res.json();
@@ -82,12 +109,70 @@ async function login() {
     if (!res.ok) {
       const detail = data.detail || "Login failed";
 
+      // -----------------------------
+      // ACCOUNT LOCKED
+      // -----------------------------
       if (detail.includes("locked")) {
-        setMsg("msg", "🔒 " + detail, "err");
-      } else if (detail.includes("Too many")) {
-        setMsg("msg", "⚠️ " + detail, "err");
-      } else {
-        setMsg("msg", detail, "err");
+        setMsg(
+          "msg",
+          "🔒 " + detail,
+          "err"
+        );
+      }
+
+      // -----------------------------
+      // TOO MANY REQUESTS / RATE LIMIT
+      // -----------------------------
+      else if (detail.includes("Too many")) {
+        setMsg(
+          "msg",
+          "⚠️ " + detail,
+          "err"
+        );
+      }
+
+      // -----------------------------
+      // WRONG PASSWORD
+      // -----------------------------
+      else if (detail.includes("Incorrect password")) {
+        setMsg(
+          "msg",
+          "❌ Incorrect password",
+          "err"
+        );
+      }
+
+      // -----------------------------
+      // USER NOT FOUND
+      // -----------------------------
+      else if (detail.includes("User does not exist")) {
+        setMsg(
+          "msg",
+          "❌ User does not exist",
+          "err"
+        );
+      }
+
+      // -----------------------------
+      // EMAIL NOT VERIFIED
+      // -----------------------------
+      else if (detail.includes("Email not verified")) {
+        setMsg(
+          "msg",
+          "⚠️ Email not verified. Please complete signup verification.",
+          "err"
+        );
+      }
+
+      // -----------------------------
+      // DEFAULT ERROR
+      // -----------------------------
+      else {
+        setMsg(
+          "msg",
+          detail,
+          "err"
+        );
       }
 
       return;
@@ -97,12 +182,17 @@ async function login() {
     localStorage.setItem("login_email", email);
 
     window.location.href = "/static/otp.html";
+
   } catch (e) {
     setMsg("msg", "Network error", "err");
   }
 }
 
-// ---------------- VERIFY OTP (UNIFIED) ----------------
+
+// ======================================================
+// VERIFY OTP (UNIFIED)
+// ======================================================
+
 async function verifyOtp() {
   try {
     const otp = qs("otp")?.value?.trim();
@@ -115,13 +205,19 @@ async function verifyOtp() {
 
     setMsg("msg", "Verifying OTP...");
 
-    // ---------- SIGNUP OTP ----------
+
+    // ==================================================
+    // SIGNUP OTP
+    // ==================================================
+
     if (mode === "signup") {
       const email = localStorage.getItem("signup_email");
 
       const res = await fetch(
         `/auth/verify-signup-otp?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`,
-        { method: "POST" }
+        {
+          method: "POST"
+        }
       );
 
       const data = await res.json();
@@ -131,16 +227,22 @@ async function verifyOtp() {
 
         if (detail.includes("locked")) {
           setMsg("msg", "🔒 " + detail, "err");
-        } else if (detail.includes("Too many")) {
+        }
+        else if (detail.includes("Too many")) {
           setMsg("msg", "⚠️ " + detail, "err");
-        } else {
+        }
+        else {
           setMsg("msg", detail, "err");
         }
 
         return;
       }
 
-      setMsg("msg", "Account verified ✅ Redirecting to login...", "ok");
+      setMsg(
+        "msg",
+        "Account verified ✅ Redirecting to login...",
+        "ok"
+      );
 
       localStorage.removeItem("otp_mode");
       localStorage.removeItem("signup_email");
@@ -148,15 +250,23 @@ async function verifyOtp() {
       setTimeout(() => {
         window.location.href = "/";
       }, 1200);
+
+      return;
     }
 
-    // ---------- LOGIN OTP ----------
+
+    // ==================================================
+    // LOGIN OTP
+    // ==================================================
+
     if (mode === "login") {
       const email = localStorage.getItem("login_email");
 
       const res = await fetch(
         `/auth/login-otp?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`,
-        { method: "POST" }
+        {
+          method: "POST"
+        }
       );
 
       const data = await res.json();
@@ -166,30 +276,41 @@ async function verifyOtp() {
 
         if (detail.includes("locked")) {
           setMsg("msg", "🔒 " + detail, "err");
-        } else if (detail.includes("Too many")) {
+        }
+        else if (detail.includes("Too many")) {
           setMsg("msg", "⚠️ " + detail, "err");
-        } else {
+        }
+        else {
           setMsg("msg", detail, "err");
         }
 
         return;
       }
 
-      localStorage.setItem("token", data.access_token);
+      localStorage.setItem(
+        "token",
+        data.access_token
+      );
 
       localStorage.removeItem("otp_mode");
       localStorage.removeItem("login_email");
 
       window.location.href = "/static/dashboard.html";
     }
+
   } catch (e) {
     setMsg("msg", "Network error", "err");
   }
 }
 
-// ---------------- AUTH HELPERS ----------------
+
+// ======================================================
+// AUTH HELPERS
+// ======================================================
+
 function requireAuth() {
   const token = localStorage.getItem("token");
+
   if (!token) {
     window.location.href = "/";
   }
@@ -200,7 +321,11 @@ function logout() {
   window.location.href = "/";
 }
 
-// ---------------- NAV HELPERS ----------------
+
+// ======================================================
+// NAV HELPERS
+// ======================================================
+
 function goSignup() {
   window.location.href = "/static/signup.html";
 }
@@ -209,7 +334,11 @@ function goLogin() {
   window.location.href = "/";
 }
 
-// ---------------- DASHBOARD NAV ----------------
+
+// ======================================================
+// DASHBOARD NAVIGATION
+// ======================================================
+
 function goNotes() {
   requireAuth();
   window.location.href = "/static/notes.html";
