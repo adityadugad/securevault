@@ -96,7 +96,7 @@ def check_multiple_ips(email: str, hours: int = 1) -> bool:
     AND created_at >= datetime('now', ?)
     """, (
         email,
-        f'-{hours} hours'
+        f"-{hours} hours"
     ))
 
     ip_count = cur.fetchone()[0]
@@ -110,6 +110,15 @@ def check_multiple_ips(email: str, hours: int = 1) -> bool:
 # =========================================================
 
 def is_account_locked(email: str, lock_type: str) -> bool:
+    """
+    Checks if latest lock is still active.
+
+    Improved:
+    - safer datetime parsing
+    - handles old bad rows safely
+    - prevents crash if malformed datetime exists
+    """
+
     cur = conn.cursor()
 
     cur.execute("""
@@ -119,7 +128,10 @@ def is_account_locked(email: str, lock_type: str) -> bool:
     AND lock_type = ?
     ORDER BY id DESC
     LIMIT 1
-    """, (email, lock_type))
+    """, (
+        email,
+        lock_type
+    ))
 
     row = cur.fetchone()
     cur.close()
@@ -127,15 +139,40 @@ def is_account_locked(email: str, lock_type: str) -> bool:
     if not row:
         return False
 
-    locked_until = datetime.fromisoformat(row[0])
+    try:
+        locked_until = datetime.fromisoformat(row[0])
+    except Exception:
+        # if bad datetime exists, ignore broken lock
+        return False
 
     return datetime.utcnow() < locked_until
 
 
 def lock_account(email: str, lock_type: str, minutes: int):
-    locked_until = (datetime.utcnow() + timedelta(minutes=minutes)).isoformat()
+    """
+    Creates a fresh temporary account lock.
+
+    Improved:
+    - removes older lock rows first
+    - cleaner latest-lock behavior
+    - avoids stale lock confusion
+    """
+
+    locked_until = (
+        datetime.utcnow() + timedelta(minutes=minutes)
+    ).isoformat()
 
     cur = conn.cursor()
+
+    # Remove previous locks of same type first
+    cur.execute("""
+    DELETE FROM account_locks
+    WHERE email = ?
+    AND lock_type = ?
+    """, (
+        email,
+        lock_type
+    ))
 
     cur.execute("""
     INSERT INTO account_locks
@@ -155,7 +192,21 @@ def lock_account(email: str, lock_type: str, minutes: int):
 # FAILED ATTEMPT HELPERS
 # =========================================================
 
-def get_failed_attempts(email: str, event_type: str, minutes: int = 30) -> int:
+def get_failed_attempts(
+    email: str,
+    event_type: str,
+    minutes: int = 30
+) -> int:
+    """
+    Count failed attempts inside recent time window.
+
+    Used for:
+    - failed login detection
+    - wrong OTP detection
+    - decrypt abuse detection
+    - admin abuse detection
+    """
+
     cur = conn.cursor()
 
     cur.execute("""
@@ -167,16 +218,27 @@ def get_failed_attempts(email: str, event_type: str, minutes: int = 30) -> int:
     """, (
         email,
         event_type,
-        f'-{minutes} minutes'
+        f"-{minutes} minutes"
     ))
 
-    count = cur.fetchone()[0]
+    count = cur.fetchone()[0] or 0
     cur.close()
 
     return count
 
 
 def reset_failed_attempts(email: str, event_type: str):
+    """
+    Clears previous failed attempts.
+
+    Used after:
+    - successful login
+    - successful OTP verification
+    - account lock trigger
+
+    This prevents infinite re-lock loops.
+    """
+
     cur = conn.cursor()
 
     cur.execute("""
