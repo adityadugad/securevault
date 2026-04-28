@@ -1,4 +1,4 @@
-```python
+
 from fastapi import APIRouter, HTTPException, status, Depends, Request
 from app.database import conn
 from app.schemas import SignupRequest, LoginRequest, TokenResponse
