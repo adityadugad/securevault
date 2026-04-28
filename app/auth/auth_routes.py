@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, HTTPException, status, Depends, Request
 from app.database import conn
 from app.schemas import SignupRequest, LoginRequest, TokenResponse
@@ -148,12 +147,17 @@ def verify_signup_otp(request: Request, email: str, otp: str):
 
 # =========================================================
 # LOGIN (SEND 2FA OTP)
+# UPDATED:
+# - Lock after 3 failed attempts
+# - Show remaining attempts
 # =========================================================
 
 @auth_router.post("/login")
 @limiter.limit(LOGIN_LIMIT)
 def login(request: Request, data: LoginRequest):
-    # First check if already locked
+    # -------------------------------------------------
+    # CHECK LOCK FIRST
+    # -------------------------------------------------
     if is_account_locked(data.email, "login"):
         raise HTTPException(
             status_code=403,
@@ -205,23 +209,12 @@ def login(request: Request, data: LoginRequest):
             30
         )
 
-        # Warning mail after 3 failed attempts
+        # ---------------------------------------------
+        # LOCK AFTER 3 FAILED ATTEMPTS
+        # ---------------------------------------------
         if failed_logins >= 3:
-            try:
-                send_email(
-                    data.email,
-                    "SecureVault Security Alert",
-                    "Multiple failed login attempts were detected on your account."
-                )
-            except:
-                pass
-
-        # Lock after 5 failed attempts
-        if failed_logins >= 5:
             lock_account(data.email, "login", 10)
 
-            # IMPORTANT FIX:
-            # reset attempts after lock to prevent infinite re-lock
             reset_failed_attempts(
                 data.email,
                 "failed_login"
@@ -241,9 +234,14 @@ def login(request: Request, data: LoginRequest):
                 detail="Account locked for 10 minutes due to multiple failed login attempts"
             )
 
+        # ---------------------------------------------
+        # SHOW REMAINING ATTEMPTS
+        # ---------------------------------------------
+        remaining_attempts = 3 - failed_logins
+
         raise HTTPException(
             status_code=401,
-            detail="Incorrect password"
+            detail=f"Incorrect password. {remaining_attempts}/3 attempts remaining before 10-minute lock."
         )
 
     # -------------------------------------------------
@@ -485,4 +483,3 @@ def read_current_user(
         "email": current_user,
         "message": "JWT authentication successful"
     }
-
