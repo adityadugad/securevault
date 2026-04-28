@@ -485,4 +485,4 @@ def read_current_user(
         "email": current_user,
         "message": "JWT authentication successful"
     }
-```
+
