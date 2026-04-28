@@ -1,7 +1,12 @@
-```javascript
 // ======================================================
-// SecureVault Authentication Logic (FINAL FIXED VERSION)
+// SecureVault Authentication Logic (FINAL STABLE VERSION)
 // Full Replaceable Code
+// Fixes:
+// - Account lock popup
+// - Wrong password popup
+// - Network error false alerts
+// - Buttons freezing after account lock
+// - Stale localStorage cleanup
 // ======================================================
 
 
@@ -15,6 +20,7 @@ function qs(id) {
 
 function setMsg(id, text, type = "") {
   const el = document.getElementById(id);
+
   if (!el) return;
 
   el.innerText = text;
@@ -23,12 +29,27 @@ function setMsg(id, text, type = "") {
 
 
 // ======================================================
-// SAFE JSON PARSER
-// Prevents "Network error" issue when backend returns
-// non-JSON / server error / FastAPI exception page
+// CLEAR TEMP AUTH STATE
+// VERY IMPORTANT FIX
+// Prevents button freeze after failed login/signup
 // ======================================================
 
-async function safeJson(res, fallbackMessage = "Server error") {
+function clearTempAuthState() {
+  localStorage.removeItem("otp_mode");
+  localStorage.removeItem("login_email");
+  localStorage.removeItem("signup_email");
+}
+
+
+// ======================================================
+// SAFE JSON PARSER
+// Prevents false "Network error"
+// ======================================================
+
+async function safeJson(
+  res,
+  fallbackMessage = "Server error"
+) {
   try {
     return await res.json();
   } catch (e) {
@@ -49,7 +70,13 @@ async function signup() {
     const password = qs("password")?.value;
 
     if (!email || !password) {
-      setMsg("msg", "Email and password required", "err");
+      clearTempAuthState();
+
+      setMsg(
+        "msg",
+        "Email and password required",
+        "err"
+      );
       return;
     }
 
@@ -72,27 +99,52 @@ async function signup() {
     );
 
     if (!res.ok) {
-      const detail = data.detail || "Signup failed";
+      clearTempAuthState();
+
+      const detail =
+        data.detail || "Signup failed";
 
       if (detail.includes("locked")) {
-        setMsg("msg", "🔒 " + detail, "err");
+        setMsg(
+          "msg",
+          "🔒 " + detail,
+          "err"
+        );
       }
       else if (detail.includes("Too many")) {
-        setMsg("msg", "⚠️ " + detail, "err");
+        setMsg(
+          "msg",
+          "⚠️ " + detail,
+          "err"
+        );
       }
       else {
-        setMsg("msg", detail, "err");
+        setMsg(
+          "msg",
+          detail,
+          "err"
+        );
       }
 
       return;
     }
 
-    localStorage.setItem("otp_mode", "signup");
-    localStorage.setItem("signup_email", email);
+    localStorage.setItem(
+      "otp_mode",
+      "signup"
+    );
 
-    window.location.href = "/static/otp.html";
+    localStorage.setItem(
+      "signup_email",
+      email
+    );
+
+    window.location.href =
+      "/static/otp.html";
 
   } catch (e) {
+    clearTempAuthState();
+
     setMsg(
       "msg",
       "Unable to connect to server",
@@ -103,7 +155,7 @@ async function signup() {
 
 
 // ======================================================
-// LOGIN (PASSWORD)
+// LOGIN
 // ======================================================
 
 async function login() {
@@ -112,11 +164,20 @@ async function login() {
     const password = qs("password")?.value;
 
     if (!email || !password) {
-      setMsg("msg", "Email and password required", "err");
+      clearTempAuthState();
+
+      setMsg(
+        "msg",
+        "Email and password required",
+        "err"
+      );
       return;
     }
 
-    setMsg("msg", "Checking credentials...");
+    setMsg(
+      "msg",
+      "Checking credentials..."
+    );
 
     const res = await fetch("/auth/login", {
       method: "POST",
@@ -129,15 +190,18 @@ async function login() {
       })
     });
 
-    // IMPORTANT FIX:
-    // prevents false "Network error"
     const data = await safeJson(
       res,
       "Login failed. Please try again."
     );
 
     if (!res.ok) {
-      const detail = data.detail || "Login failed";
+      // CRITICAL FIX
+      // prevents stuck buttons after lock
+      clearTempAuthState();
+
+      const detail =
+        data.detail || "Login failed";
 
       // -----------------------------
       // ACCOUNT LOCKED
@@ -154,7 +218,7 @@ async function login() {
       }
 
       // -----------------------------
-      // RATE LIMIT / TOO MANY REQUESTS
+      // TOO MANY REQUESTS
       // -----------------------------
       else if (
         detail.includes("Too many")
@@ -219,12 +283,22 @@ async function login() {
       return;
     }
 
-    localStorage.setItem("otp_mode", "login");
-    localStorage.setItem("login_email", email);
+    localStorage.setItem(
+      "otp_mode",
+      "login"
+    );
 
-    window.location.href = "/static/otp.html";
+    localStorage.setItem(
+      "login_email",
+      email
+    );
+
+    window.location.href =
+      "/static/otp.html";
 
   } catch (e) {
+    clearTempAuthState();
+
     setMsg(
       "msg",
       "Unable to connect to server",
@@ -235,15 +309,18 @@ async function login() {
 
 
 // ======================================================
-// VERIFY OTP (UNIFIED)
+// VERIFY OTP
 // ======================================================
 
 async function verifyOtp() {
   try {
     const otp = qs("otp")?.value?.trim();
-    const mode = localStorage.getItem("otp_mode");
+    const mode =
+      localStorage.getItem("otp_mode");
 
     if (!otp || !mode) {
+      clearTempAuthState();
+
       setMsg(
         "msg",
         "OTP session expired",
@@ -252,7 +329,10 @@ async function verifyOtp() {
       return;
     }
 
-    setMsg("msg", "Verifying OTP...");
+    setMsg(
+      "msg",
+      "Verifying OTP..."
+    );
 
 
     // ==================================================
@@ -260,7 +340,10 @@ async function verifyOtp() {
     // ==================================================
 
     if (mode === "signup") {
-      const email = localStorage.getItem("signup_email");
+      const email =
+        localStorage.getItem(
+          "signup_email"
+        );
 
       const res = await fetch(
         `/auth/verify-signup-otp?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`,
@@ -275,29 +358,45 @@ async function verifyOtp() {
       );
 
       if (!res.ok) {
-        const detail = data.detail || "Invalid OTP";
+        clearTempAuthState();
+
+        const detail =
+          data.detail || "Invalid OTP";
 
         if (detail.includes("locked")) {
-          setMsg("msg", "🔒 " + detail, "err");
+          setMsg(
+            "msg",
+            "🔒 " + detail,
+            "err"
+          );
         }
-        else if (detail.includes("Too many")) {
-          setMsg("msg", "⚠️ " + detail, "err");
+        else if (
+          detail.includes("Too many")
+        ) {
+          setMsg(
+            "msg",
+            "⚠️ " + detail,
+            "err"
+          );
         }
         else {
-          setMsg("msg", detail, "err");
+          setMsg(
+            "msg",
+            detail,
+            "err"
+          );
         }
 
         return;
       }
+
+      clearTempAuthState();
 
       setMsg(
         "msg",
         "Account verified ✅ Redirecting to login...",
         "ok"
       );
-
-      localStorage.removeItem("otp_mode");
-      localStorage.removeItem("signup_email");
 
       setTimeout(() => {
         window.location.href = "/";
@@ -312,7 +411,10 @@ async function verifyOtp() {
     // ==================================================
 
     if (mode === "login") {
-      const email = localStorage.getItem("login_email");
+      const email =
+        localStorage.getItem(
+          "login_email"
+        );
 
       const res = await fetch(
         `/auth/login-otp?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`,
@@ -327,16 +429,33 @@ async function verifyOtp() {
       );
 
       if (!res.ok) {
-        const detail = data.detail || "Invalid OTP";
+        clearTempAuthState();
+
+        const detail =
+          data.detail || "Invalid OTP";
 
         if (detail.includes("locked")) {
-          setMsg("msg", "🔒 " + detail, "err");
+          setMsg(
+            "msg",
+            "🔒 " + detail,
+            "err"
+          );
         }
-        else if (detail.includes("Too many")) {
-          setMsg("msg", "⚠️ " + detail, "err");
+        else if (
+          detail.includes("Too many")
+        ) {
+          setMsg(
+            "msg",
+            "⚠️ " + detail,
+            "err"
+          );
         }
         else {
-          setMsg("msg", detail, "err");
+          setMsg(
+            "msg",
+            detail,
+            "err"
+          );
         }
 
         return;
@@ -347,14 +466,21 @@ async function verifyOtp() {
         data.access_token
       );
 
-      localStorage.removeItem("otp_mode");
-      localStorage.removeItem("login_email");
+      localStorage.removeItem(
+        "otp_mode"
+      );
+
+      localStorage.removeItem(
+        "login_email"
+      );
 
       window.location.href =
         "/static/dashboard.html";
     }
 
   } catch (e) {
+    clearTempAuthState();
+
     setMsg(
       "msg",
       "Unable to connect to server",
@@ -369,7 +495,8 @@ async function verifyOtp() {
 // ======================================================
 
 function requireAuth() {
-  const token = localStorage.getItem("token");
+  const token =
+    localStorage.getItem("token");
 
   if (!token) {
     window.location.href = "/";
@@ -387,11 +514,15 @@ function logout() {
 // ======================================================
 
 function goSignup() {
+  clearTempAuthState();
+
   window.location.href =
     "/static/signup.html";
 }
 
 function goLogin() {
+  clearTempAuthState();
+
   window.location.href = "/";
 }
 
@@ -423,4 +554,3 @@ function goPqc() {
   window.location.href =
     "/static/pqc.html";
 }
-```
