@@ -22,7 +22,7 @@ from app.security.security_utils import (
     is_account_locked,
 )
 
-import os
+
 import base64
 
 vault_router = APIRouter(tags=["Vault"])
@@ -30,9 +30,11 @@ vault_router = APIRouter(tags=["Vault"])
 
 # ================= ADMIN CONFIG =================
 
-ADMIN_ID = os.getenv("ADMIN_ID")
-ADMIN_PASS = os.getenv("ADMIN_PASS")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
+from app.config import (
+    ADMIN_ID,
+    ADMIN_PASS,
+    ADMIN_EMAIL
+)
 
 
 # =========================================================
