@@ -104,7 +104,6 @@
 <script src="/static/js/auth.js"></script>
 
 <script>
-
 function formatLabel(text) {
   return text.replaceAll("_"," ")
              .toLowerCase()
@@ -112,7 +111,6 @@ function formatLabel(text) {
 }
 
 async function loadPqcMetrics() {
-
   const res = await fetch("/pqc/metrics");
   const data = await res.json();
 
@@ -120,7 +118,6 @@ async function loadPqcMetrics() {
   table.innerHTML = "";
 
   for (const k in data) {
-
     let r = document.createElement("tr");
 
     r.innerHTML =
@@ -130,23 +127,17 @@ async function loadPqcMetrics() {
     table.appendChild(r);
   }
 }
-
 </script>
-
-
 
 <script>
 
+let adminIdGlobal = null; // ✅ store admin id for OTP verify
+
 window.addEventListener("keydown", function(e) {
-
   if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "d") {
-
     openAdminPanel();
-
   }
-
 });
-
 
 async function openAdminPanel() {
 
@@ -156,10 +147,12 @@ async function openAdminPanel() {
   let pass = prompt("Admin Password:");
   if (!pass) return;
 
+  adminIdGlobal = id; // ✅ save for next step
+
   let r1 = await fetch("/vault/admin/request-otp", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({id,pass})
+    body: JSON.stringify({id, pass})
   });
 
   if(!r1.ok){
@@ -173,7 +166,10 @@ async function openAdminPanel() {
   let r2 = await fetch("/vault/admin/encrypted-db",{
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({otp:otp.trim()})
+    body: JSON.stringify({
+      id: adminIdGlobal,   // ✅ FIX ADDED
+      otp: otp.trim()
+    })
   });
 
   if(!r2.ok){
@@ -182,23 +178,16 @@ async function openAdminPanel() {
   }
 
   let data = await r2.json();
-
   showAdmin(data);
-
 }
 
-
-
 function showAdmin(data){
-
   let box = document.getElementById("adminBox");
 
   let html = "<h2>Encrypted Database</h2>";
 
   html += "<h3>Notes</h3>";
-
   data.notes.forEach(n=>{
-
     html += "<pre>"
       +"ID: "+n.id+"\n"
       +"User: "+n.user+"\n"
@@ -209,14 +198,10 @@ function showAdmin(data){
       +"Type: "+n.type+"\n"
       +"Created: "+n.created
       +"</pre>";
-
   });
 
-
   html += "<h3>Todos</h3>";
-
   data.todos.forEach(t=>{
-
     html += "<pre>"
       +"ID: "+t.id+"\n"
       +"User: "+t.user+"\n"
@@ -227,14 +212,10 @@ function showAdmin(data){
       +"Type: "+t.type+"\n"
       +"Created: "+t.created
       +"</pre>";
-
   });
 
-
   html += "<h3>Passwords</h3>";
-
   data.passwords.forEach(p=>{
-
     html += "<pre>"
       +"ID: "+p.id+"\n"
       +"User: "+p.user+"\n"
@@ -245,17 +226,13 @@ function showAdmin(data){
       +"Type: "+p.type+"\n"
       +"Created: "+p.created
       +"</pre>";
-
   });
-
 
   html += "<br><button onclick='closeAdmin()'>Close</button>";
 
   box.innerHTML = html;
   box.style.display = "block";
-
 }
-
 
 function closeAdmin(){
   document.getElementById("adminBox").style.display="none";
