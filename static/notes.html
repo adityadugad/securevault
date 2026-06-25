@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -7,7 +8,9 @@
   <link rel="stylesheet" href="/static/css/style.css" />
 
   <!-- ONLY SMALL, SAFE OVERRIDES -->
+
   <style>
+
     /* Fix overlap with sidebar + GIF background */
     .main {
       margin-left: 240px;
@@ -67,7 +70,7 @@
       text-align: center;
     }
 
-    /* 🔧 NEW: center notes list safely */
+    /* NOTES LIST */
     .notes-list-wrapper {
       display: flex;
       justify-content: center;
@@ -78,12 +81,91 @@
       width: 100%;
       max-width: 1100px;
     }
+
+    /* COPYRIGHT FOOTER */
+
+    .copyright-footer {
+
+      position: fixed;
+
+      bottom: 10px;
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      width: 95%;
+
+      text-align: center;
+
+      font-size: 12px;
+
+      color: rgba(255,255,255,0.78);
+
+      z-index: 999;
+
+      letter-spacing: 0.4px;
+
+      user-select: none;
+
+      pointer-events: none;
+
+    }
+
+    /* WATERMARK */
+
+    .watermark {
+
+      position: fixed;
+
+      bottom: 45px;
+      right: 20px;
+
+      font-size: 34px;
+      font-weight: bold;
+
+      color: rgba(255,255,255,0.05);
+
+      transform: rotate(-18deg);
+
+      z-index: 1;
+
+      pointer-events: none;
+
+      user-select: none;
+
+    }
+
+    @media(max-width:768px){
+
+      .copyright-footer{
+
+        font-size: 10px;
+        padding: 0 10px;
+
+      }
+
+      .watermark{
+
+        font-size: 22px;
+
+      }
+
+    }
+
   </style>
+
 </head>
 
 <body onload="requireAuth(); loadNotes();">
 
+  <!-- WATERMARK -->
+
+  <div class="watermark">
+    SecureVault
+  </div>
+
   <!-- SIDEBAR -->
+
   <div class="nav">
     <h3>🔐 SecureVault</h3>
     <a href="/static/dashboard.html">Dashboard</a>
@@ -95,41 +177,72 @@
   </div>
 
   <!-- MAIN -->
+
   <div class="main">
-    <h1 class="notes-heading">📝 Encrypted Notes</h1>
-    <p class="muted notes-heading">
-      Notes are encrypted using PQC-backed AES-GCM keys
-    </p>
 
-    <!-- CREATE NOTE -->
-    <div class="create-note-wrapper">
-      <div class="card" style="margin-bottom:24px">
-        <h3>Create New Note</h3>
+```
+<h1 class="notes-heading">📝 Encrypted Notes</h1>
 
-        <label>Title</label>
-        <input id="noteTitle" type="text" placeholder="Note title" />
+<p class="muted notes-heading">
+  Notes are encrypted using PQC-backed AES-GCM keys
+</p>
 
-        <label>Content</label>
-        <textarea id="noteContent" placeholder="Write your note..."></textarea>
+<!-- CREATE NOTE -->
+<div class="create-note-wrapper">
 
-        <div class="center-btn">
-          <button class="btn" onclick="saveNote()">💾 Save Encrypted Note</button>
-        </div>
+  <div class="card" style="margin-bottom:24px">
 
-        <div id="noteMsg" class="msg"></div>
-      </div>
+    <h3>Create New Note</h3>
+
+    <label>Title</label>
+
+    <input id="noteTitle" type="text" placeholder="Note title" />
+
+    <label>Content</label>
+
+    <textarea id="noteContent" placeholder="Write your note..."></textarea>
+
+    <div class="center-btn">
+
+      <button class="btn" onclick="saveNote()">
+        💾 Save Encrypted Note
+      </button>
+
     </div>
 
-    <!-- 📝 NOTES LIST (CENTERED FIX) -->
-    <div class="notes-list-wrapper">
-      <div class="grid" id="notesList">
-        <!-- JS injects notes here -->
-      </div>
-    </div>
+    <div id="noteMsg" class="msg"></div>
+
+  </div>
+
+</div>
+
+<!-- NOTES LIST -->
+<div class="notes-list-wrapper">
+
+  <div class="grid" id="notesList">
+    <!-- JS injects notes here -->
+  </div>
+
+</div>
+```
+
+  </div>
+
+  <!-- COPYRIGHT FOOTER -->
+
+  <div class="copyright-footer">
+
+```
+© 2026 SecureVault | Developed by Aditya G. Dugad and Team | All Rights Reserved
+```
+
   </div>
 
   <!-- SCRIPTS -->
+
   <script src="/static/js/auth.js"></script>
+
   <script src="/static/js/notes.js"></script>
+
 </body>
 </html>
