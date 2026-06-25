@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -7,14 +8,16 @@
   <link rel="stylesheet" href="/static/css/style.css" />
 
   <style>
+
     body {
       margin: 0;
       overflow: hidden;
       position: relative;
-      background: transparent !important; /* override style.css */
+      background: transparent !important;
     }
 
     /* FORCE VIDEO TO BACK */
+
     .bg-video {
       position: fixed;
       inset: 0;
@@ -25,6 +28,7 @@
     }
 
     /* Ensure content above video */
+
     .container,
     .card {
       position: relative;
@@ -56,144 +60,311 @@
       color: #9ca3af;
       user-select: none;
     }
+
+    /* COPYRIGHT FOOTER */
+
+    .copyright-footer {
+
+      position: fixed;
+
+      bottom: 10px;
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      width: 95%;
+
+      text-align: center;
+
+      font-size: 12px;
+
+      color: rgba(255,255,255,0.78);
+
+      z-index: 999;
+
+      letter-spacing: 0.4px;
+
+      user-select: none;
+
+    }
+
+    /* WATERMARK */
+
+    .watermark {
+
+      position: fixed;
+
+      bottom: 45px;
+      right: 20px;
+
+      font-size: 34px;
+      font-weight: bold;
+
+      color: rgba(255,255,255,0.05);
+
+      transform: rotate(-18deg);
+
+      z-index: 1;
+
+      pointer-events: none;
+
+      user-select: none;
+
+    }
+
+    @media(max-width:768px){
+
+      .copyright-footer{
+
+        font-size: 10px;
+        padding: 0 10px;
+
+      }
+
+      .watermark{
+
+        font-size: 22px;
+
+      }
+
+    }
+
   </style>
+
 </head>
 
 <body>
 
+  <!-- WATERMARK -->
+
+  <div class="watermark">
+    SecureVault
+  </div>
+
   <!-- Background Video -->
+
   <video autoplay muted loop playsinline class="bg-video">
-    <source src="/static/img/login-bg.mp4" type="video/mp4">
+
+```
+<source src="/static/img/login-bg.mp4" type="video/mp4">
+```
+
   </video>
 
   <div class="container">
-    <div class="card">
-      <span class="badge">PQC Secured</span>
 
-      <h1>Create Account</h1>
-      <p>Quantum-safe signup</p>
+```
+<div class="card">
 
-      <label>Email</label>
-      <input id="email" type="email" placeholder="you@example.com" />
+  <span class="badge">PQC Secured</span>
 
-      <!-- Password -->
-      <label>Password</label>
-      <div class="password-wrapper">
-        <input
-          id="password"
-          type="password"
-          placeholder="••••••••"
-          oninput="onPasswordInput(this.value)"
-        />
-        <span class="toggle-eye" onclick="togglePassword('password')">👁</span>
-      </div>
+  <h1>Create Account</h1>
 
-      <!-- Confirm Password -->
-      <label>Confirm Password</label>
-      <div class="password-wrapper">
-        <input
-          id="confirmPassword"
-          type="password"
-          placeholder="••••••••"
-          oninput="checkConfirmPassword()"
-        />
-        <span class="toggle-eye" onclick="togglePassword('confirmPassword')">👁</span>
-      </div>
+  <p>Quantum-safe signup</p>
 
-      <!-- Password rules note -->
-      <div class="password-note">
-        Password must be at least 8 characters and include uppercase, lowercase,
-        and a special character.
-      </div>
+  <label>Email</label>
 
-      <!-- Strength feedback -->
-      <div id="strengthText" class="strength-text muted"></div>
+  <input id="email" type="email" placeholder="you@example.com" />
 
-      <button class="btn" onclick="signupWithValidation()">
-        Sign up
-      </button>
+  <!-- Password -->
 
-      <div id="msg" class="msg"></div>
-    </div>
+  <label>Password</label>
+
+  <div class="password-wrapper">
+
+    <input
+      id="password"
+      type="password"
+      placeholder="••••••••"
+      oninput="onPasswordInput(this.value)"
+    />
+
+    <span class="toggle-eye" onclick="togglePassword('password')">
+      👁
+    </span>
+
+  </div>
+
+  <!-- Confirm Password -->
+
+  <label>Confirm Password</label>
+
+  <div class="password-wrapper">
+
+    <input
+      id="confirmPassword"
+      type="password"
+      placeholder="••••••••"
+      oninput="checkConfirmPassword()"
+    />
+
+    <span class="toggle-eye" onclick="togglePassword('confirmPassword')">
+      👁
+    </span>
+
+  </div>
+
+  <!-- Password rules note -->
+
+  <div class="password-note">
+
+    Password must be at least 8 characters and include uppercase, lowercase,
+    and a special character.
+
+  </div>
+
+  <!-- Strength feedback -->
+
+  <div id="strengthText" class="strength-text muted"></div>
+
+  <button class="btn" onclick="signupWithValidation()">
+    Sign up
+  </button>
+
+  <div id="msg" class="msg"></div>
+
+</div>
+```
+
+  </div>
+
+  <!-- COPYRIGHT FOOTER -->
+
+  <div class="copyright-footer">
+
+```
+© 2026 SecureVault | Developed by Aditya G. Dugad and Team | All Rights Reserved
+```
+
   </div>
 
   <script src="/static/js/auth.js"></script>
 
   <script>
+
     let passwordValid = false;
+
     let confirmValid = false;
 
     function onPasswordInput(pwd) {
+
       validatePasswordRules(pwd);
+
       checkPasswordStrength(pwd);
+
       checkConfirmPassword();
+
     }
 
     function validatePasswordRules(pwd) {
+
       const msg = document.getElementById("msg");
+
       const input = document.getElementById("password");
 
       const hasUpper = /[A-Z]/.test(pwd);
+
       const hasLower = /[a-z]/.test(pwd);
+
       const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
+
       const hasLength = pwd.length >= 8;
 
       passwordValid = hasUpper && hasLower && hasSpecial && hasLength;
 
       if (!pwd) {
+
         msg.innerText = "";
+
         input.style.borderColor = "";
+
         return;
+
       }
 
       if (!passwordValid) {
+
         msg.innerText =
           "Password must contain 8+ characters, uppercase, lowercase, and special character.";
+
         msg.className = "msg err";
+
         input.style.borderColor = "#ef4444";
+
       } else {
+
         msg.innerText = "";
+
         input.style.borderColor = "";
+
       }
+
     }
 
     function checkConfirmPassword() {
+
       const pwd = document.getElementById("password").value;
+
       const confirmPwd = document.getElementById("confirmPassword").value;
+
       const msg = document.getElementById("msg");
+
       const confirmInput = document.getElementById("confirmPassword");
 
       if (!confirmPwd) {
+
         confirmValid = false;
+
         confirmInput.style.borderColor = "";
+
         return;
+
       }
 
       if (pwd !== confirmPwd) {
+
         confirmValid = false;
+
         msg.innerText = "Passwords do not match.";
+
         msg.className = "msg err";
+
         confirmInput.style.borderColor = "#ef4444";
+
       } else {
+
         confirmValid = true;
+
         msg.innerText = "";
+
         confirmInput.style.borderColor = "";
+
       }
+
     }
 
     async function checkPasswordStrength(pwd) {
+
       const text = document.getElementById("strengthText");
 
       if (!pwd) {
+
         text.innerText = "";
+
         return;
+
       }
 
       try {
+
         const res = await fetch("/vault/password-strength", {
+
           method: "POST",
+
           headers: { "Content-Type": "application/json" },
+
           body: JSON.stringify({ password: pwd })
+
         });
 
         if (!res.ok) return;
@@ -201,36 +372,60 @@
         const data = await res.json();
 
         if (data.strength === "weak") {
+
           text.innerText = "Password strength: Weak";
+
           text.style.color = "#ef4444";
+
         } else if (data.strength === "medium") {
+
           text.innerText = "Password strength: Medium";
+
           text.style.color = "#facc15";
+
         } else {
+
           text.innerText = "Password strength: Strong";
+
           text.style.color = "#22c55e";
+
         }
+
       } catch {
+
         // silent fail
+
       }
+
     }
 
     function togglePassword(id) {
+
       const input = document.getElementById(id);
+
       input.type = input.type === "password" ? "text" : "password";
+
     }
 
     function signupWithValidation() {
+
       if (!passwordValid || !confirmValid) {
+
         const msg = document.getElementById("msg");
+
         msg.innerText =
           "Please meet the password requirements and confirm your password.";
+
         msg.className = "msg err";
+
         return;
+
       }
 
       signup();
+
     }
+
   </script>
 
 </body>
