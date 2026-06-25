@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -7,8 +8,10 @@
   <link rel="stylesheet" href="/static/css/style.css" />
 
   <!-- ONLY SMALL, SAFE OVERRIDES -->
+
   <style>
-    /* Main layout + GIF background (ONLY CHANGE) */
+
+    /* Main layout + GIF background */
     .main {
       margin-left: 240px;
       width: calc(100% - 240px);
@@ -18,13 +21,12 @@
       justify-content: center;
       align-items: center;
 
-      /* 🔧 Fill full viewport */
       min-height: 100vh;
 
-      /* GIF BACKGROUND */
       background:
         linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)),
         url('/static/img/module-bggif.gif');
+
       background-size: cover;
       background-position: center;
     }
@@ -54,15 +56,95 @@
     }
 
     /* Center heading */
+
     .todo-heading {
       text-align: center;
     }
+
+    /* COPYRIGHT FOOTER */
+
+    .copyright-footer {
+
+      position: fixed;
+
+      bottom: 10px;
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      width: 95%;
+
+      text-align: center;
+
+      font-size: 12px;
+
+      color: rgba(255,255,255,0.78);
+
+      z-index: 999;
+
+      letter-spacing: 0.4px;
+
+      user-select: none;
+
+      pointer-events: none;
+
+    }
+
+    /* WATERMARK */
+
+    .watermark {
+
+      position: fixed;
+
+      bottom: 45px;
+      right: 20px;
+
+      font-size: 34px;
+      font-weight: bold;
+
+      color: rgba(255,255,255,0.05);
+
+      transform: rotate(-18deg);
+
+      z-index: 1;
+
+      pointer-events: none;
+
+      user-select: none;
+
+    }
+
+    @media(max-width:768px){
+
+      .copyright-footer{
+
+        font-size: 10px;
+        padding: 0 10px;
+
+      }
+
+      .watermark{
+
+        font-size: 22px;
+
+      }
+
+    }
+
   </style>
+
 </head>
 
 <body onload="requireAuth(); loadTodos();">
 
-  <!-- SIDEBAR (UNCHANGED) -->
+  <!-- WATERMARK -->
+
+  <div class="watermark">
+    SecureVault
+  </div>
+
+  <!-- SIDEBAR -->
+
   <div class="nav">
     <h3>🔐 SecureVault</h3>
     <a href="/static/dashboard.html">Dashboard</a>
@@ -74,60 +156,99 @@
   </div>
 
   <!-- MAIN -->
+
   <div class="main">
-    <div class="todo-wrapper">
 
-      <h1 class="todo-heading">✅ Encrypted To-Dos</h1>
-      <p class="muted todo-heading">Tasks are encrypted before storage</p>
+```
+<div class="todo-wrapper">
 
-      <!-- ADD TODO -->
-      <div class="card" style="margin-bottom:24px">
-        <h3>Add New Task</h3>
+  <h1 class="todo-heading">✅ Encrypted To-Dos</h1>
 
-        <label>Task</label>
+  <p class="muted todo-heading">
+    Tasks are encrypted before storage
+  </p>
 
-        <!-- task + calendar -->
-        <div class="todo-row">
-          <input id="todoTask" type="text" placeholder="Your task..." />
-          <input id="todoDate" type="date" />
-        </div>
+  <!-- ADD TODO -->
 
-        <div class="center-btn">
-          <button class="btn" onclick="prepareAndSaveTodo()">
-            💾 Save Encrypted Task
-          </button>
-        </div>
+  <div class="card" style="margin-bottom:24px">
 
-        <div id="todoMsg" class="msg"></div>
-      </div>
+    <h3>Add New Task</h3>
 
-      <!-- TODO LIST (UNCHANGED) -->
-      <div class="grid" id="todosList"></div>
+    <label>Task</label>
+
+    <!-- task + calendar -->
+
+    <div class="todo-row">
+
+      <input id="todoTask" type="text" placeholder="Your task..." />
+
+      <input id="todoDate" type="date" />
 
     </div>
+
+    <div class="center-btn">
+
+      <button class="btn" onclick="prepareAndSaveTodo()">
+        💾 Save Encrypted Task
+      </button>
+
+    </div>
+
+    <div id="todoMsg" class="msg"></div>
+
   </div>
 
-  <!-- SCRIPTS (UNCHANGED) -->
+  <!-- TODO LIST -->
+
+  <div class="grid" id="todosList"></div>
+
+</div>
+```
+
+  </div>
+
+  <!-- COPYRIGHT FOOTER -->
+
+  <div class="copyright-footer">
+
+```
+© 2026 SecureVault | Developed by Aditya G. Dugad and Team | All Rights Reserved
+```
+
+  </div>
+
+  <!-- SCRIPTS -->
+
   <script src="/static/js/auth.js"></script>
+
   <script src="/static/js/todos.js"></script>
 
-  <!-- HELPER FUNCTION (UNCHANGED) -->
+  <!-- HELPER FUNCTION -->
+
   <script>
+
     function prepareAndSaveTodo() {
+
       const taskInput = document.getElementById("todoTask");
+
       const dateInput = document.getElementById("todoDate");
 
       if (dateInput.value) {
+
         const d = new Date(dateInput.value);
+
         const formattedDate =
           d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear().toString().slice(-2);
 
         taskInput.value =
           taskInput.value + " on or before " + formattedDate;
+
       }
 
-      saveTodo(); // existing function, unchanged
+      saveTodo();
+
     }
+
   </script>
 
 </body>
