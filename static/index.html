@@ -1,17 +1,29 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>SecureVault • Login</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- COPYRIGHT META -->
+
+  <meta name="author" content="Aditya G. Dugad and Team">
+  <meta name="copyright" content="SecureVault © 2026">
+  <meta name="application-name" content="SecureVault">
+
   <!-- Modern theme -->
+
   <link rel="stylesheet" href="/static/css/style.css" />
 
   <style>
+
     html, body {
       height: 100%;
       overflow-y: auto;
+      margin: 0;
+      padding: 0;
     }
 
     .bg-video {
@@ -43,91 +55,201 @@
       text-align: center;
       font-size: 0.9rem;
     }
+
+    /* COPYRIGHT FOOTER */
+
+    .copyright-footer {
+
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+
+      width: 95%;
+
+      text-align: center;
+
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+
+      z-index: 5;
+
+      letter-spacing: 0.5px;
+
+      user-select: none;
+
+    }
+
+    /* WATERMARK */
+
+    .watermark {
+
+      position: fixed;
+
+      bottom: 40px;
+      right: 25px;
+
+      font-size: 38px;
+      font-weight: bold;
+
+      color: rgba(255,255,255,0.05);
+
+      transform: rotate(-18deg);
+
+      pointer-events: none;
+
+      z-index: 1;
+
+      user-select: none;
+
+    }
+
+    @media(max-width:768px){
+
+      .copyright-footer{
+
+        font-size: 11px;
+        padding: 0 10px;
+
+      }
+
+      .watermark{
+
+        font-size: 24px;
+
+      }
+
+    }
+
   </style>
+
 </head>
 
 <body>
 
   <!-- BACKGROUND VIDEO -->
+
   <video id="bgVideo" class="bg-video" autoplay muted loop playsinline>
     <source src="/static/img/signvideo-bg.mp4?v=1" type="video/mp4">
   </video>
 
-  <!-- CONTENT -->
-  <div class="container">
-    <div class="card">
+  <!-- WATERMARK -->
 
-      <div class="brand">
-        <span class="badge">PQC Secured</span>
-      </div>
-
-      <h1>SecureVault</h1>
-      <p>Login with quantum-safe protection</p>
-
-      <label>Email</label>
-      <input type="email" id="email" placeholder="you@example.com" />
-
-      <label>Password</label>
-      <input type="password" id="password" placeholder="••••••••" />
-
-      <!-- LOGIN BUTTON -->
-      <button class="btn" onclick="loginWithWake()">Login</button>
-
-      <a href="/static/forgot-password.html" class="forgot-link muted">
-        Forgot password?
-      </a>
-
-      <div class="row" style="margin-top:12px">
-        <button class="btn secondary" onclick="goSignup()">
-          Create account
-        </button>
-      </div>
-
-      <div id="msg" class="msg"></div>
-
-    </div>
+  <div class="watermark">
+    SecureVault
   </div>
 
-  <!-- AUTH JS (unchanged) -->
+  <!-- CONTENT -->
+
+  <div class="container">
+
+```
+<div class="card">
+
+  <div class="brand">
+    <span class="badge">PQC Secured</span>
+  </div>
+
+  <h1>SecureVault</h1>
+
+  <p>Login with quantum-safe protection</p>
+
+  <label>Email</label>
+
+  <input type="email" id="email" placeholder="you@example.com" />
+
+  <label>Password</label>
+
+  <input type="password" id="password" placeholder="••••••••" />
+
+  <!-- LOGIN BUTTON -->
+  <button class="btn" onclick="loginWithWake()">
+    Login
+  </button>
+
+  <a href="/static/forgot-password.html" class="forgot-link muted">
+    Forgot password?
+  </a>
+
+  <div class="row" style="margin-top:12px">
+
+    <button class="btn secondary" onclick="goSignup()">
+      Create account
+    </button>
+
+  </div>
+
+  <div id="msg" class="msg"></div>
+
+</div>
+```
+
+  </div>
+
+  <!-- COPYRIGHT FOOTER -->
+
+  <div class="copyright-footer">
+
+```
+© 2026 SecureVault | Developed by Aditya G. Dugad and Team | All Rights Reserved
+```
+
+  </div>
+
+  <!-- AUTH JS -->
+
   <script src="/static/js/auth.js"></script>
 
   <!-- Slow video -->
+
   <script>
+
     window.addEventListener("load", function () {
+
       const video = document.getElementById("bgVideo");
+
       if (video) {
+
         video.playbackRate = 0.7;
+
       }
+
     });
+
   </script>
 
+  <!-- WAKE REQUEST + LOGIN WRAPPER -->
 
-  <!-- ✅ WAKE REQUEST + LOGIN WRAPPER -->
   <script>
 
-  async function loginWithWake() {
+    async function loginWithWake() {
 
-    try {
+      try {
 
-      // wake render backend
-      fetch("https://pqc-dashboard.onrender.com/", {
-        method: "GET",
-        mode: "no-cors"
-      }).catch(() => {});
+        // wake render backend
 
-      // small delay for cold start
-      await new Promise(r => setTimeout(r, 800));
+        fetch("https://pqc-dashboard.onrender.com/", {
 
-      // call original login function
-      login();
+          method: "GET",
+          mode: "no-cors"
 
-    } catch (e) {
+        }).catch(() => {});
 
-      login();
+        // small delay for cold start
+
+        await new Promise(r => setTimeout(r, 800));
+
+        // call original login function
+
+        login();
+
+      } catch (e) {
+
+        login();
+
+      }
 
     }
-
-  }
 
   </script>
 
